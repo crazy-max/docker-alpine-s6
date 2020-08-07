@@ -43,16 +43,18 @@ jobs:
 
           if [ "$VERSION" != "$ALPINE_VERSION" ]; then
             TAGS="--tag ${DOCKER_IMAGE}:${ALPINE_VERSION}-${VERSION}"
+            echo ::set-output name=version::${ALPINE_VERSION}-${VERSION}
           else
             TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
+            echo ::set-output name=version::${VERSION}
           fi
           if [ "$VERSION" != "edge" ]; then
             TAGS="--tag ${DOCKER_IMAGE}:${ALPINE_VERSION}"
+            echo ::set-output name=version::${ALPINE_VERSION}
           fi
 
           echo ::set-output name=docker_username::${DOCKER_USERNAME}
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${VERSION}
           echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
             --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
             --build-arg VERSION=${VERSION} \
