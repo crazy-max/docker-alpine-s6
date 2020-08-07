@@ -1,5 +1,4 @@
 <p align="center">
-  <a href="https://hub.docker.com/r/crazymax/alpine-s6/tags?page=1&ordering=last_updated"><img src="https://img.shields.io/github/v/tag/crazy-max/docker-alpine-s6?label=version&style=flat-square" alt="Latest Version"></a>
   <a href="https://github.com/crazy-max/docker-alpine-s6/actions?workflow=build"><img src="https://img.shields.io/github/workflow/status/crazy-max/docker-alpine-s6/build?label=build&logo=github&style=flat-square" alt="Build Status"></a>
   <a href="https://hub.docker.com/r/crazymax/alpine-s6/"><img src="https://img.shields.io/docker/stars/crazymax/alpine-s6.svg?style=flat-square&logo=docker" alt="Docker Stars"></a>
   <a href="https://hub.docker.com/r/crazymax/alpine-s6/"><img src="https://img.shields.io/docker/pulls/crazymax/alpine-s6.svg?style=flat-square&logo=docker" alt="Docker Pulls"></a>
