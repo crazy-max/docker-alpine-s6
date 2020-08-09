@@ -15,19 +15,32 @@ RUN apk --update --no-cache add \
     binutils \
     build-base \
     curl \
-    tar
+    skalibs-dev \
+    tar \
+    tree
 
 ENV JUSTC_ENVDIR_VERSION="1.0.0"
 WORKDIR /tmp/justc-envdir
-RUN apk --update --no-cache add \
-    skalibs-dev \
-  && curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
+RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
   && ./configure \
     --enable-shared \
     --disable-allstatic \
     --prefix=/usr \
   && make -j$(nproc) \
-  && make install
+  && make DESTDIR=/dist install \
+  && tree /dist
+
+ENV SOCKLOG_VERSION="2.2.1" \
+  SOCKLOG_RELEASE="5"
+WORKDIR /tmp/socklog
+RUN curl -sSL "https://github.com/just-containers/socklog/releases/download/v${SOCKLOG_VERSION}-${SOCKLOG_RELEASE}/socklog-${SOCKLOG_VERSION}.tar.gz" | tar xz --strip 1 \
+  && ./configure \
+    --enable-shared \
+    --disable-allstatic \
+    --prefix=/usr \
+  && make -j$(nproc) \
+  && make DESTDIR=/dist install \
+  && tree /dist
 
 ARG ALPINE_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest}
@@ -49,7 +62,7 @@ LABEL maintainer="CrazyMax" \
 
 ENV S6_OVERLAY_VERSION="2.0.0.1"
 
-COPY --from=builder /usr/bin/justc-envdir /usr/bin/justc-envdir
+COPY --from=builder /dist /
 
 RUN apk --update --no-cache add \
     s6 \
@@ -65,3 +78,21 @@ RUN apk --update --no-cache add \
   && tar zxf s6-overlay-nobin.tar.gz \
   && apk del build-dependencies \
   && s6-rmrf s6-overlay-nobin* /var/cache/apk/* /tmp/*
+
+RUN apk --update --no-cache add -t build-dependencies \
+    rsync \
+  && wget -q "https://github.com/just-containers/socklog-overlay/archive/master.zip" -qO "/tmp/socklog-overlay.zip" \
+  && unzip /tmp/socklog-overlay.zip -d /tmp/ \
+  && rsync -a /tmp/socklog-overlay-master/overlay-rootfs/ / \
+  && mkdir -p /var/log/socklog/cron \
+    /var/log/socklog/daemon \
+    /var/log/socklog/debug \
+    /var/log/socklog/errors \
+    /var/log/socklog/everything \
+    /var/log/socklog/kernel \
+    /var/log/socklog/mail \
+    /var/log/socklog/messages \
+    /var/log/socklog/secure \
+    /var/log/socklog/user \
+  && apk del build-dependencies \
+  && s6-rmrf /etc/socklog.rules/* /var/cache/apk/* /tmp/*

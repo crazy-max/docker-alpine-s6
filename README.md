@@ -14,6 +14,11 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 
 💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
 
+## Features
+
+* Multi-platform image
+* [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
+
 ## Multi-platform image
 
 Following platforms for this image are available:
