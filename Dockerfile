@@ -95,4 +95,4 @@ RUN apk --update --no-cache add -t build-dependencies \
     /var/log/socklog/secure \
     /var/log/socklog/user \
   && apk del build-dependencies \
-  && s6-rmrf /etc/socklog.rules/* /var/cache/apk/* /tmp/*
+  && s6-rmrf /var/cache/apk/* /tmp/*
