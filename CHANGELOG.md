@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0.1-RC4 (2020/08/10)
+
+* Keep socklog rules
+* Review build stages
+
 ## 2.0.0.1-RC3 (2020/08/09)
 
 * Add [socklog-overlay](https://github.com/just-containers/socklog-overlay)
