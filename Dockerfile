@@ -94,3 +94,5 @@ RUN apk --update --no-cache add \
   && s6-rmrf /var/cache/apk/* /tmp/*
 
 COPY --from=builder /dist /
+
+ENTRYPOINT ["/init"]
