@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0.1-RC5 (2020/09/04)
+
+* Add entrypoint (#8)
+
 ## 2.0.0.1-RC4 (2020/08/10)
 
 * Keep socklog rules
