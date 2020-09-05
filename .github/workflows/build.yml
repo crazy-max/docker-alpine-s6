@@ -30,7 +30,7 @@ jobs:
         id: prep
         run: |
           DOCKERHUB_IMAGE=crazymax/alpine-s6
-          GHCR_IMAGE=ghcr.io/${DOCKERHUB_IMAGE}
+          GHCR_IMAGE=ghcr.io/${{ github.repository_owner }}/alpine-s6
           ALPINE_VERSION=${{ matrix.alpine_version }}
           VERSION=edge
 
