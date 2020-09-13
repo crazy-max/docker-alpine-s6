@@ -12,7 +12,7 @@ ARG VERSION
 ENV JUSTC_ENVDIR_VERSION="1.0.0" \
   SOCKLOG_VERSION="2.2.1" \
   SOCKLOG_RELEASE="5" \
-  S6_OVERLAY_VERSION="2.0.0.1" \
+  S6_OVERLAY_VERSION="2.1.0.0" \
   DIST_PATH="/dist"
 
 RUN apk --update --no-cache add \

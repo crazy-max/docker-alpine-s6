@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0.0-RC1 (2020/09/13)
+
+* s6-overlay 2.1.0.0
+
 ## 2.0.0.1-RC5 (2020/09/04)
 
 * Add entrypoint (#8)
