@@ -39,8 +39,8 @@ Image: crazymax/alpine-s6:latest
 
 ## Supported tags
 
-* `3.12-edge`, `latest-edge`,
-* `3.12`, `latest`, `3.12-2.1.0.0`, `latest-2.1.0.0`
+* `edge`, `3.12-edge`
+* `latest`, `3.12`, `3.12-2.1.0.0`, `latest-2.1.0.0`
 * `3.12-2.0.0.1`, `latest-2.0.0.1`
 * `3.11-edge`
 * `3.11`, `3.11-2.1.0.0`
