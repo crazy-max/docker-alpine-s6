@@ -12,6 +12,7 @@ ARG VERSION
 ENV JUSTC_ENVDIR_VERSION="1.0.0" \
   SOCKLOG_VERSION="2.2.1" \
   SOCKLOG_RELEASE="5" \
+  S6_OVERLAY_PREINIT_VERSION="1.0.2" \
   S6_OVERLAY_VERSION="2.1.0.0" \
   DIST_PATH="/dist"
 
@@ -42,6 +43,15 @@ RUN curl -sSL "https://github.com/just-containers/socklog/releases/download/v${S
     --enable-shared \
     --disable-allstatic \
     --prefix=/usr \
+  && make -j$(nproc) \
+  && make DESTDIR=${DIST_PATH} install \
+  && tree ${DIST_PATH}
+
+WORKDIR /tmp/s6-overlay-preinit
+RUN curl -sSL "https://github.com/just-containers/s6-overlay-preinit/releases/download/v${S6_OVERLAY_PREINIT_VERSION}/s6-overlay-preinit-${S6_OVERLAY_PREINIT_VERSION}.tar.gz" | tar xz --strip 1 \
+  && ./configure \
+    --enable-shared \
+    --disable-allstatic \
   && make -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install \
   && tree ${DIST_PATH}
