@@ -6,6 +6,7 @@
 /.github
 /.editorconfig
 /.gitignore
+/test
 /CHANGELOG.md
 /LICENSE
 /README.md
