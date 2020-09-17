@@ -41,7 +41,7 @@ jobs:
             VERSION=${TAG%-*}
           fi
           TAGS=""
-          if [[ "$VERSION" != "$ALPINE_VERSION" ]] && [[ "$VERSION" != "edge" ]]; then
+          if [[ "$VERSION" != "$ALPINE_VERSION" ]]; then
             TAGS="${TAGS}${DOCKERHUB_IMAGE}:${ALPINE_VERSION}-${VERSION},"
             TAGS="${TAGS}${GHCR_IMAGE}:${ALPINE_VERSION}-${VERSION},"
             echo ::set-output name=version::${ALPINE_VERSION}-${VERSION}
