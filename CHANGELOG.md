@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0.2-RC1 (2020/10/24)
+
+* s6-overlay 2.1.0.2
+
 ## 2.1.0.0-RC2 (2020/09/14)
 
 * Add missing s6-overlay-preinit binary
