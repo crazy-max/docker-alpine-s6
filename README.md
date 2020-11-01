@@ -13,12 +13,24 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 
 💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
 
+___
+
+* [Features](#features)
+* [Docker image](#docker-image)
+* [How can I help?](#how-can-i-help)
+* [License](#license)
+
 ## Features
 
 * Multi-platform image
 * [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
 
-## Multi-platform image
+## Docker image
+
+| Registry                                                                                         | Image                           |
+|--------------------------------------------------------------------------------------------------|---------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/alpine-s6/)                                            | `crazymax/alpine-s6`                 |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6)  | `ghcr.io/crazy-max/alpine-s6`        |
 
 Following platforms for this image are available:
 
