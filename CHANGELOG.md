@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0.2-RC3 (2020/12/11)
+
+* Upstream Alpine update
+
 ## 2.1.0.2-RC2 (2020/11/25)
 
 * Upstream Alpine update
