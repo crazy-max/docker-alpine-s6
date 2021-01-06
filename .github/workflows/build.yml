@@ -48,7 +48,7 @@ jobs:
             TAGS="${TAGS}${DOCKERHUB_IMAGE}:${ALPINE_VERSION}-${VERSION},"
             TAGS="${TAGS}${GHCR_IMAGE}:${ALPINE_VERSION}-${VERSION},"
             echo ::set-output name=version::${ALPINE_VERSION}-${VERSION}
-            if [ "$$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
+            if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
               TAGS="${TAGS}${DOCKERHUB_IMAGE}:latest-${VERSION},"
               TAGS="${TAGS}${GHCR_IMAGE}:latest-${VERSION},"
             fi
@@ -67,7 +67,7 @@ jobs:
             TAGS="${TAGS}${DOCKERHUB_IMAGE}:${ALPINE_VERSION},"
             TAGS="${TAGS}${GHCR_IMAGE}:${ALPINE_VERSION},"
             echo ::set-output name=version::${ALPINE_VERSION}
-            if [ "$$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
+            if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
               TAGS="${TAGS}${DOCKERHUB_IMAGE}:latest,"
               TAGS="${TAGS}${GHCR_IMAGE}:latest,"
             fi
