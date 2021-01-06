@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0.2-RC5 (2021/01/06)
+
+* Handle alpine edge
+
 ## 2.1.0.2-RC4 (2020/12/17)
 
 * Upstream Alpine update
