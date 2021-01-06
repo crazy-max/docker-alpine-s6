@@ -1,11 +1,5 @@
 ARG ALPINE_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest} as builder
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
 
 ENV JUSTC_ENVDIR_VERSION="1.0.0" \
   SOCKLOG_VERSION="2.2.1" \
@@ -74,6 +68,7 @@ RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/master.z
     ${DIST_PATH}/var/log/socklog/user \
   && tree ${DIST_PATH}
 
+ARG TARGETPLATFORM
 ARG ALPINE_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest}
 

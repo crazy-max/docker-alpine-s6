@@ -23,6 +23,7 @@ jobs:
           - 3.11
           - 3.12
           - latest
+          - edge
     runs-on: ubuntu-latest
     steps:
       -
