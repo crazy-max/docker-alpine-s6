@@ -4,7 +4,7 @@
 
 * s6-overlay 2.2.0.0
 * Alpine Linux 3.13
-* Build skalibs from sources (2.10.0.0)
+* Build skalibs from sources (2.10.0.1)
 * Build execline from sources (2.7.0.0)
 * Build s6 from sources (2.10.0.0)
 * Build s6-dns from sources (2.3.5.0)

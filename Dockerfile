@@ -1,7 +1,8 @@
 ARG ALPINE_VERSION
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest} as builder
+ARG ALPINE_BUILD_VERSION
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_BUILD_VERSION:-${ALPINE_VERSION:-latest}} as builder
 
-ENV SKALIBS_VERSION="2.10.0.0" \
+ENV SKALIBS_VERSION="2.10.0.1" \
   EXECLINE_VERSION="2.7.0.0" \
   S6_VERSION="2.10.0.0" \
   S6_DNS_VERSION="2.3.5.0" \
@@ -18,7 +19,6 @@ ENV SKALIBS_VERSION="2.10.0.0" \
 
 RUN apk --update --no-cache add \
     bearssl-dev \
-    binutils \
     build-base \
     curl \
     rsync \
