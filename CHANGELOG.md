@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.0.0-r1 (2021/01/21)
+
+* s6-overlay 2.2.0.0
+* Alpine Linux 3.13
+* Build skalibs from sources (2.10.0.0)
+* Build execline from sources (2.7.0.0)
+* Build s6 from sources (2.10.0.0)
+* Build s6-dns from sources (2.3.5.0)
+* Build s6-linux-utils from sources (2.5.1.4)
+* Build s6-networking from sources (2.4.0.0)
+* Build s6-portable-utils from sources (2.2.3.1)
+* Build s6-rc from sources (0.5.2.1)
+* justc-envdir 1.0.1
+* socklog 2.2.2
+* s6-overlay-preinit 1.0.4
+
 ## 2.1.0.2-RC5 (2021/01/06)
 
 * Handle alpine edge
