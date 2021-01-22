@@ -12,6 +12,7 @@
 * Build s6-networking from sources (2.4.0.0)
 * Build s6-portable-utils from sources (2.2.3.1)
 * Build s6-rc from sources (0.5.2.1)
+* Add justc-installer 1.0.1-2
 * justc-envdir 1.0.1
 * socklog 2.2.2
 * s6-overlay-preinit 1.0.4

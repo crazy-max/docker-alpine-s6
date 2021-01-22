@@ -11,6 +11,8 @@ ENV SKALIBS_VERSION="2.10.0.1" \
   S6_PORTABLE_UTILS_VERSION="2.2.3.1" \
   S6_RC_VERSION="0.5.2.1" \
   JUSTC_ENVDIR_VERSION="1.0.1" \
+  JUSTC_INSTALLER_VERSION="1.0.1" \
+  JUSTC_INSTALLER_RELEASE="-2" \
   SOCKLOG_VERSION="2.2.2" \
   SOCKLOG_RELEASE="" \
   S6_OVERLAY_PREINIT_VERSION="1.0.4" \
@@ -32,6 +34,7 @@ RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
   && ./configure \
     --enable-shared \
     --enable-static \
+    --enable-allstatic \
     --libdir=/usr/lib \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && make install -j$(nproc) \
@@ -43,7 +46,7 @@ RUN curl -sSL "https://skarnet.org/software/execline/execline-${EXECLINE_VERSION
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --libdir=/usr/lib \
     --with-dynlib=/lib \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -56,7 +59,7 @@ COPY patchs/s6 .
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --libdir=/usr/lib \
     --libexecdir=/lib/s6 \
     --with-dynlib=/lib \
@@ -73,7 +76,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-dns/s6-dns-${S6_DNS_VERSION}.tar.
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
     --libexecdir=/usr/lib/s6-dns \
@@ -87,7 +90,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-linux-utils/s6-linux-utils-${S6_L
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -99,7 +102,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NET
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
     --libexecdir=/usr/lib/s6-networking \
@@ -114,7 +117,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-portable-utils/s6-portable-utils-
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -126,7 +129,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-rc/s6-rc-${S6_RC_VERSION}.tar.gz"
   && ./configure \
     --enable-shared \
     --enable-static \
-    --disable-allstatic \
+    --enable-allstatic \
     --libdir=/usr/lib \
     --libexecdir=/lib/s6-rc \
     --with-dynlib=/lib \
@@ -138,7 +141,17 @@ WORKDIR /tmp/justc-envdir
 RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
   && ./configure \
     --enable-shared \
-    --disable-allstatic \
+    --enable-allstatic \
+    --prefix=/usr \
+  && make DESTDIR=${DIST_PATH} install -j$(nproc) \
+  && make install -j$(nproc) \
+  && tree ${DIST_PATH}
+
+WORKDIR /tmp/justc-installer
+RUN curl -sSL "https://github.com/just-containers/justc-installer/releases/download/v${JUSTC_INSTALLER_VERSION}${JUSTC_INSTALLER_RELEASE}/justc-installer-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
+  && ./configure \
+    --enable-shared \
+    --enable-allstatic \
     --prefix=/usr \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && make install -j$(nproc) \
@@ -148,7 +161,7 @@ WORKDIR /tmp/socklog
 RUN curl -sSL "https://github.com/just-containers/socklog/releases/download/v${SOCKLOG_VERSION}${SOCKLOG_RELEASE}/socklog-${SOCKLOG_VERSION}.tar.gz" | tar xz --strip 1 \
   && ./configure \
     --enable-shared \
-    --disable-allstatic \
+    --enable-allstatic \
     --prefix=/usr \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && make install -j$(nproc) \
@@ -158,7 +171,7 @@ WORKDIR /tmp/s6-overlay-preinit
 RUN curl -sSL "https://github.com/just-containers/s6-overlay-preinit/releases/download/v${S6_OVERLAY_PREINIT_VERSION}/s6-overlay-preinit-${S6_OVERLAY_PREINIT_VERSION}.tar.gz" | tar xz --strip 1 \
   && ./configure \
     --enable-shared \
-    --disable-allstatic \
+    --enable-allstatic \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && make install -j$(nproc) \
   && tree ${DIST_PATH}
@@ -184,24 +197,20 @@ RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/master.z
     ${DIST_PATH}/var/log/socklog/user \
   && tree ${DIST_PATH}
 
+WORKDIR /dist
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+RUN mkdir -p /out \
+  && tar -zcvf /out/s6-overlay_${S6_OVERLAY_VERSION}_${TARGETOS}_${TARGETARCH}${TARGETVARIANT}.tar.gz .
+
+FROM scratch AS artifacts
+COPY --from=builder /out/*.tar.gz /
+
 ARG TARGETPLATFORM
 ARG ALPINE_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest}
-
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-
-LABEL maintainer="CrazyMax" \
-  org.opencontainers.image.created=$BUILD_DATE \
-  org.opencontainers.image.url="https://github.com/crazy-max/docker-alpine-s6" \
-  org.opencontainers.image.source="https://github.com/crazy-max/docker-alpine-s6" \
-  org.opencontainers.image.version=$VERSION \
-  org.opencontainers.image.revision=$VCS_REF \
-  org.opencontainers.image.vendor="CrazyMax" \
-  org.opencontainers.image.title="alpine-s6" \
-  org.opencontainers.image.description="Alpine Linux with s6 overlay" \
-  org.opencontainers.image.licenses="MIT"
+LABEL maintainer="CrazyMax"
 
 COPY --from=builder /dist /
 
