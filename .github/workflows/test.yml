@@ -37,9 +37,9 @@ jobs:
         run: |
           echo ::set-output name=base_image::test-alpine-s6
           echo ::set-output name=build_tag::test
-          echo ::set-output name=container_name::pure-ftpd
+          echo ::set-output name=container_name::rrdcached
           echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::[services.d] done
+          echo ::set-output name=running_log_check::listening for connections
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -57,7 +57,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
             ALPINE_BUILD_VERSION=${{ matrix.alpine_build_version }}
       -
-        name: Build Pure-FTPd
+        name: Build RRDCached
         uses: docker/build-push-action@v2
         with:
           context: ./test
@@ -67,7 +67,7 @@ jobs:
           load: true
           tags: ${{ steps.prep.outputs.build_tag }}
       -
-        name: Start Pure-FTPd
+        name: Start RRDCached
         run: |
           docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
           docker run -d --name ${{ steps.prep.outputs.container_name }} ${{ steps.prep.outputs.build_tag }}
