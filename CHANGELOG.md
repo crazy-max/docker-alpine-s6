@@ -1,8 +1,8 @@
 # Changelog
 
-## 2.2.0.0-r1 (2021/01/21)
+## 2.2.0.1-r0 (2021/01/22)
 
-* s6-overlay 2.2.0.0
+* s6-overlay 2.2.0.1
 * Alpine Linux 3.13
 * Build skalibs from sources (2.10.0.1)
 * Build execline from sources (2.7.0.0)
