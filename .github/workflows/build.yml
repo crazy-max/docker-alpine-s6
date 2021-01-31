@@ -121,7 +121,7 @@ jobs:
         if: matrix.alpine_version == env.ALPINE_LATEST
         uses: actions/upload-artifact@v2
         with:
-          name: diun
+          name: s6-overlay
           path: ./dist/*
           if-no-files-found: error
       -
