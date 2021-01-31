@@ -17,6 +17,7 @@
 * socklog 2.2.2
 * socklog-overlay 3.1.1-1
 * s6-overlay-preinit 1.0.4
+* Switch to buildx bake
 
 ## 2.1.0.2-RC5 (2021/01/06)
 
