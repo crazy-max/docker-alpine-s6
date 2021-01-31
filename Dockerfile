@@ -3,18 +3,21 @@ ARG ALPINE_BUILD_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_BUILD_VERSION:-${ALPINE_VERSION:-latest}} as builder
 
 ENV SKALIBS_VERSION="2.10.0.1" \
-  EXECLINE_VERSION="2.7.0.0" \
-  S6_VERSION="2.10.0.0" \
+  EXECLINE_VERSION="2.7.0.1" \
+  S6_VERSION="2.10.0.1" \
   S6_DNS_VERSION="2.3.5.0" \
   S6_LINUX_UTILS_VERSION="2.5.1.4" \
   S6_NETWORKING_VERSION="2.4.0.0" \
   S6_PORTABLE_UTILS_VERSION="2.2.3.1" \
   S6_RC_VERSION="0.5.2.1" \
   JUSTC_ENVDIR_VERSION="1.0.1" \
+  JUSTC_ENVDIR_RELEASE="-1" \
   JUSTC_INSTALLER_VERSION="1.0.1" \
   JUSTC_INSTALLER_RELEASE="-2" \
   SOCKLOG_VERSION="2.2.2" \
   SOCKLOG_RELEASE="" \
+  SOCKLOG_OVERLAY_VERSION="3.1.1" \
+  SOCKLOG_OVERLAY_RELEASE="-1" \
   S6_OVERLAY_PREINIT_VERSION="1.0.4" \
   S6_OVERLAY_VERSION="2.2.0.1" \
   DIST_PATH="/dist"
@@ -138,7 +141,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-rc/s6-rc-${S6_RC_VERSION}.tar.gz"
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/justc-envdir
-RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
+RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}${JUSTC_ENVDIR_RELEASE}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1 \
   && ./configure \
     --enable-shared \
     --enable-allstatic \
@@ -181,9 +184,9 @@ RUN curl -SsOL https://github.com/just-containers/s6-overlay/releases/download/v
   && tar zxf s6-overlay-nobin.tar.gz -C ${DIST_PATH}/
 
 WORKDIR /tmp/socklog-overlay
-RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/master.zip" -qO "socklog-overlay.zip" \
+RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/v${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}.zip" -qO "socklog-overlay.zip" \
   && unzip socklog-overlay.zip \
-  && rsync -a ./socklog-overlay-master/overlay-rootfs/ ${DIST_PATH}/ \
+  && rsync -a ./socklog-overlay-${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}/overlay-rootfs/ ${DIST_PATH}/ \
   && mkdir -p \
     ${DIST_PATH}/var/log/socklog/cron \
     ${DIST_PATH}/var/log/socklog/daemon \
