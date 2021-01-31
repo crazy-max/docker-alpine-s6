@@ -16,7 +16,8 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 ___
 
 * [Features](#features)
-* [Docker image](#docker-image)
+* [Build locally](#build-locally)
+* [Image](#image)
 * [How can I help?](#how-can-i-help)
 * [License](#license)
 
@@ -24,8 +25,25 @@ ___
 
 * Multi-platform image
 * [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
+* [justc-installer](https://github.com/just-containers/justc-installer) included
 
-## Docker image
+## Build locally
+
+```shell
+git clone https://github.com/crazy-max/docker-alpine-s6.git
+cd docker-alpine-s6
+
+# Build image and output to docker (default)
+docker buildx bake
+
+# Build multi-platform image
+docker buildx bake image-all
+
+# Build artifacts and output to ./dist
+docker buildx bake artifact-all
+```
+
+## Image
 
 | Registry                                                                                         | Image                           |
 |--------------------------------------------------------------------------------------------------|---------------------------------|
@@ -50,15 +68,18 @@ Image: crazymax/alpine-s6:latest
 
 ## Supported tags
 
-* `edge`, `edge-2.1.0.2`
-* `latest-edge`, `3.12-edge`
-* `latest`, `latest-2.1.0.2`, `3.12`, `3.12-2.1.0.2`
-* `3.12-2.1.0.0`, `latest-2.1.0.0`
-* `3.12-2.0.0.1`, `latest-2.0.0.1`
+* `edge`, `edge-x.x.x.x`
+* `latest-edge`, `3.13-edge`
+* `latest`, `latest-x.x.x.x`, `3.13`, `3.13-x.x.x.x`
+* `3.13-x.x.x.x`, `latest-x.x.x.x`
+* `3.12-edge`
+* `3.12`, `3.12-x.x.x.x`
+* `3.12-x.x.x.x`
 * `3.11-edge`
-* `3.11`, `3.11-2.1.0.2`
-* `3.11-2.1.0.0`
-* `3.11-2.0.0.1`
+* `3.11`, `3.11-x.x.x.x`
+* `3.11-x.x.x.x`
+
+> `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `2.1.0.0`).
 
 ## How can I help?
 

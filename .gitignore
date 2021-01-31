@@ -1,7 +1,5 @@
 /.dev
-
-# JetBrains
 /.idea
-/*.ipr
 /*.iml
-/*.iws
+
+/dist
