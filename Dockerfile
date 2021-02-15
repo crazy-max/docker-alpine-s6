@@ -71,9 +71,9 @@ RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/v${SOCKL
   && mv socklog-overlay-${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE} socklog-overlay \
   && rm -f socklog-overlay.zip
 
+ARG TARGETPLATFORM
 ARG ALPINE_VERSION
-ARG ALPINE_BUILD_VERSION
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_BUILD_VERSION:-${ALPINE_VERSION:-latest}} as builder
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest} as builder
 
 ENV DIST_PATH="/dist"
 

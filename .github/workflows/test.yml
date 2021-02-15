@@ -19,13 +19,9 @@ jobs:
       matrix:
         include:
           - alpine_version: 3.11
-            alpine_build_version: 3.11
           - alpine_version: 3.12
-            alpine_build_version: 3.12
           - alpine_version: 3.13
-            alpine_build_version: 3.13
           - alpine_version: edge
-            alpine_build_version: 3.13
     runs-on: ubuntu-latest
     steps:
       -
@@ -55,7 +51,6 @@ jobs:
           tags: ${{ steps.prep.outputs.base_image }}
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
-            ALPINE_BUILD_VERSION=${{ matrix.alpine_build_version }}
       -
         name: Build RRDCached
         uses: docker/build-push-action@v2
