@@ -105,7 +105,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       -
         name: Build artifacts
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: artifact-all
         env:
