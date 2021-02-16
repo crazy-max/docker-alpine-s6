@@ -26,13 +26,9 @@ jobs:
       matrix:
         include:
           - alpine_version: 3.11
-            alpine_build_version: 3.11
           - alpine_version: 3.12
-            alpine_build_version: 3.12
           - alpine_version: 3.13
-            alpine_build_version: 3.13
           - alpine_version: edge
-            alpine_build_version: 3.13
     runs-on: ubuntu-latest
     steps:
       -
@@ -105,12 +101,11 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       -
         name: Build artifacts
-        uses: crazy-max/ghaction-docker-buildx-bake@v1
+        uses: docker/bake-action@v1
         with:
           targets: artifact-all
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
-          ALPINE_BUILD_VERSION: ${{ matrix.alpine_build_version }}
       -
         name: Move artifacts
         if: matrix.alpine_version == env.ALPINE_LATEST
@@ -125,7 +120,7 @@ jobs:
           path: ./dist/*
           if-no-files-found: error
       -
-        name: Build image
+        name: Build
         uses: docker/bake-action@v1
         with:
           files: |
@@ -135,7 +130,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
-          ALPINE_BUILD_VERSION: ${{ matrix.alpine_build_version }}
       -
         name: GitHub Release
         uses: softprops/action-gh-release@v1

@@ -3,15 +3,9 @@ variable "ALPINE_VERSION" {
   default = "latest"
 }
 
-// Alpine build version
-variable "ALPINE_BUILD_VERSION" {
-  default = "latest"
-}
-
 target "args" {
   args = {
     ALPINE_VERSION = ALPINE_VERSION
-    ALPINE_BUILD_VERSION = ALPINE_BUILD_VERSION
   }
 }
 
