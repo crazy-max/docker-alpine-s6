@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r1 (2021/02/17)
+
+* Upstream Alpine update
+
 ## 2.2.0.3-r0 (2021/02/16)
 
 * s6-overlay 2.2.0.3 (#17)
