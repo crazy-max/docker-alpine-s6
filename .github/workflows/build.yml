@@ -3,14 +3,14 @@ name: build
 on:
   push:
     branches:
-      - 'master'
+      - '2.1'
     tags:
-      - '*'
+      - '2.1.*'
     paths-ignore:
       - '**.md'
   pull_request:
     branches:
-      - 'master'
+      - '2.1'
     paths-ignore:
       - '**.md'
 
@@ -38,7 +38,7 @@ jobs:
         name: Prepare
         run: |
           ALPINE_VERSION=${{ matrix.alpine_version }}
-          VERSION=edge
+          VERSION=2.1
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
             VERSION=${TAG%-r*}
@@ -54,12 +54,6 @@ jobs:
               IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION},"
             else
               IMAGE_TAGS="${IMAGE_TAGS}${VERSION},"
-            fi
-          fi
-          if [ "$VERSION" != "edge" ]; then
-            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION},"
-            if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
-              IMAGE_TAGS="${IMAGE_TAGS}latest,"
             fi
           fi
           echo "IMAGE_TAGS=${IMAGE_TAGS}" >> $GITHUB_ENV

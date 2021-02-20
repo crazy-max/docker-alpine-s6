@@ -1,21 +1,19 @@
-ARG SKALIBS_VERSION="2.10.0.1"
-ARG EXECLINE_VERSION="2.7.0.1"
-ARG S6_VERSION="2.10.0.1"
-ARG S6_DNS_VERSION="2.3.5.0"
-ARG S6_LINUX_UTILS_VERSION="2.5.1.4"
-ARG S6_NETWORKING_VERSION="2.4.0.0"
-ARG S6_PORTABLE_UTILS_VERSION="2.2.3.1"
-ARG S6_RC_VERSION="0.5.2.1"
-ARG JUSTC_ENVDIR_VERSION="1.0.1"
-ARG JUSTC_ENVDIR_RELEASE="-1"
+ARG SKALIBS_VERSION="2.9.3.0"
+ARG EXECLINE_VERSION="2.6.1.1"
+ARG S6_VERSION="2.9.2.0"
+ARG S6_DNS_VERSION="2.3.3.0"
+ARG S6_LINUX_UTILS_VERSION="2.5.1.3"
+ARG S6_NETWORKING_VERSION="2.3.2.0"
+ARG S6_PORTABLE_UTILS_VERSION="2.2.3.0"
+ARG S6_RC_VERSION="0.5.2.0"
+ARG JUSTC_ENVDIR_VERSION="1.0.0"
+ARG JUSTC_ENVDIR_RELEASE=""
 ARG JUSTC_INSTALLER_VERSION="1.0.1"
-ARG JUSTC_INSTALLER_RELEASE="-2"
-ARG SOCKLOG_VERSION="2.2.2"
-ARG SOCKLOG_RELEASE=""
-ARG SOCKLOG_OVERLAY_VERSION="3.1.1"
-ARG SOCKLOG_OVERLAY_RELEASE="-1"
-ARG S6_OVERLAY_PREINIT_VERSION="1.0.5"
-ARG S6_OVERLAY_VERSION="2.2.0.3"
+ARG JUSTC_INSTALLER_RELEASE=""
+ARG SOCKLOG_OVERLAY_VERSION="2.2.1"
+ARG SOCKLOG_OVERLAY_RELEASE="-4"
+ARG S6_OVERLAY_PREINIT_VERSION="1.0.4"
+ARG S6_OVERLAY_VERSION="2.1.0.2"
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine as download
 
@@ -31,8 +29,6 @@ ARG JUSTC_ENVDIR_VERSION
 ARG JUSTC_ENVDIR_RELEASE
 ARG JUSTC_INSTALLER_VERSION
 ARG JUSTC_INSTALLER_RELEASE
-ARG SOCKLOG_VERSION
-ARG SOCKLOG_RELEASE
 ARG SOCKLOG_OVERLAY_VERSION
 ARG SOCKLOG_OVERLAY_RELEASE
 ARG S6_OVERLAY_PREINIT_VERSION
@@ -59,8 +55,6 @@ WORKDIR /dist/justc-envdir
 RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}${JUSTC_ENVDIR_RELEASE}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1
 WORKDIR /dist/justc-installer
 RUN curl -sSL "https://github.com/just-containers/justc-installer/releases/download/v${JUSTC_INSTALLER_VERSION}${JUSTC_INSTALLER_RELEASE}/justc-installer-${JUSTC_INSTALLER_VERSION}.tar.gz" | tar xz --strip 1
-WORKDIR /dist/socklog
-RUN curl -sSL "https://github.com/just-containers/socklog/releases/download/v${SOCKLOG_VERSION}${SOCKLOG_RELEASE}/socklog-${SOCKLOG_VERSION}.tar.gz" | tar xz --strip 1
 WORKDIR /dist/s6-overlay-preinit
 RUN curl -sSL "https://github.com/just-containers/s6-overlay-preinit/releases/download/v${S6_OVERLAY_PREINIT_VERSION}/s6-overlay-preinit-${S6_OVERLAY_PREINIT_VERSION}.tar.gz" | tar xz --strip 1
 WORKDIR /dist/s6-overlay
@@ -82,23 +76,20 @@ RUN apk --update --no-cache add \
     build-base \
     curl \
     rsync \
+    socklog \
     tar \
     tree
 
 COPY --from=download /dist /tmp
 
 WORKDIR /tmp/skalibs
-COPY patchs/skalibs .
-RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
-  && ./configure \
+RUN ./configure \
     --enable-shared \
     --enable-static \
     --enable-allstatic \
     --libdir=/usr/lib \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
-  && mkdir -p "${DIST_PATH}/usr/lib/pkgconfig" \
-  && cp -f skalibs.pc "${DIST_PATH}/usr/lib/pkgconfig/skalibs.pc" \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/execline
@@ -123,8 +114,6 @@ RUN ./configure \
     --with-dynlib=/lib \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
-  && mkdir -p "${DIST_PATH}/lib/s6" \
-  && cp s6-svscanboot "${DIST_PATH}/lib/s6/s6-svscanboot" \
   && mkdir -p "${DIST_PATH}/etc/init.d" \
   && cp s6.initd "${DIST_PATH}/etc/init.d/s6" \
   && tree ${DIST_PATH}
@@ -208,15 +197,6 @@ RUN ./configure \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && tree ${DIST_PATH}
 
-WORKDIR /tmp/socklog
-RUN ./configure \
-    --enable-shared \
-    --enable-allstatic \
-    --prefix=/usr \
-  && make install -j$(nproc) \
-  && make DESTDIR=${DIST_PATH} install -j$(nproc) \
-  && tree ${DIST_PATH}
-
 WORKDIR /tmp/s6-overlay-preinit
 RUN ./configure \
     --enable-shared \
@@ -262,10 +242,11 @@ ARG ALPINE_VERSION
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION:-latest}
 LABEL maintainer="CrazyMax"
 
-COPY --from=builder /dist /
-
 RUN apk --update --no-cache add \
     bearssl \
-  && s6-rmrf /var/cache/apk/* /tmp/*
+    socklog \
+  && rm -rf /var/cache/apk/* /tmp/*
+
+COPY --from=builder /dist /
 
 ENTRYPOINT ["/init"]
