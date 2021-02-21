@@ -87,6 +87,8 @@ jobs:
             >&2 echo "❌ Container ${{ steps.prep.outputs.container_name }} returned status '$CONTAINER_STATUS'"
             exit 1
           fi
+
+          docker stop ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
       -
         name: Container logs
         if: always()
