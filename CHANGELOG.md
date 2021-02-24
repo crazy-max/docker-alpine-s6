@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0.3-r3 / 2.1.0.2-r7 (2021/02/24)
+
+* Upstream Alpine update
+
+## 2.1.0.2-r6 (2021/02/20)
+
+* s6-overlay 2.1 on a dedicated branch
+
 ## 2.2.0.3-r2 (2021/02/20)
 
 * s6-overlay-preinit 1.0.5
