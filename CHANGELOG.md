@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r5 / 2.1.0.2-r9 (2021/03/02)
+
+* Add gosu
+
 ## 2.2.0.3-r4 / 2.1.0.2-r8 (2021/02/26)
 
 * Upstream Alpine update
