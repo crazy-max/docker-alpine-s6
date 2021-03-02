@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r6 / 2.1.0.2-r10 (2021/03/02)
+
+* No need gosu (see https://github.com/crazy-max/gosu#from-dockerfile)
+
 ## 2.2.0.3-r5 / 2.1.0.2-r9 (2021/03/02)
 
 * Add gosu
