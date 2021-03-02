@@ -14,6 +14,7 @@ ARG SOCKLOG_OVERLAY_VERSION="2.2.1"
 ARG SOCKLOG_OVERLAY_RELEASE="-4"
 ARG S6_OVERLAY_PREINIT_VERSION="1.0.4"
 ARG S6_OVERLAY_VERSION="2.1.0.2"
+ARG GOSU_VERSION="1.12"
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine as download
 
@@ -224,6 +225,23 @@ RUN rsync -a ./overlay-rootfs/ ${DIST_PATH}/ \
     ${DIST_PATH}/var/log/socklog/secure \
     ${DIST_PATH}/var/log/socklog/user \
   && tree ${DIST_PATH}
+
+ARG TARGETPLATFORM
+ARG GOSU_VERSION
+WORKDIR /tmp/gosu
+RUN GOSU_ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
+    "linux/amd64")   echo "amd64"    ;; \
+    "linux/arm/v6")  echo "armel"    ;; \
+    "linux/arm/v7")  echo "armhf"    ;; \
+    "linux/arm64")   echo "arm64"    ;; \
+    "linux/386")     echo "i386"     ;; \
+    "linux/ppc64le") echo "ppc64el"  ;; \
+    "linux/s390x")   echo "s390x"    ;; \
+    *)               echo ""         ;; esac) \
+  && echo "GOSU_ARCH=$GOSU_ARCH" \
+  && mkdir -p ${DIST_PATH}/usr/local/bin/ \
+  && curl -sSL "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-${GOSU_ARCH}" -o "${DIST_PATH}/usr/local/bin/gosu" \
+  && chmod +x ${DIST_PATH}/usr/local/bin/gosu
 
 WORKDIR /dist
 ARG TARGETOS
