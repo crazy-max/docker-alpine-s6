@@ -25,8 +25,23 @@ ___
 ## Features
 
 * Multi-platform image
+* Artifacts provided on [releases page](https://github.com/crazy-max/docker-alpine-s6/releases)
+* Multi-platform [distribution image](#dist-image)
 * [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
-* [justc-installer](https://github.com/just-containers/justc-installer) included
+* Compiled from source:
+  * [skalibs](https://github.com/skarnet/skalibs)
+  * [execline](https://github.com/skarnet/execline)
+  * [s6](https://github.com/skarnet/s6)
+  * [s6-dns](https://github.com/skarnet/s6-dns)
+  * [s6-linux-utils](https://github.com/skarnet/s6-linux-utils)
+  * [s6-networking](https://github.com/skarnet/s6-networking)
+  * [s6-dns](https://github.com/skarnet/s6-dns)
+  * [s6-portable-utils](https://github.com/skarnet/s6-portable-utils)
+  * [s6-rc](https://github.com/skarnet/s6-rc)
+  * [justc-envdir](https://github.com/just-containers/justc-envdir)
+  * [justc-installer](https://github.com/just-containers/justc-installer)
+  * [socklog](https://github.com/just-containers/socklog)
+  * [s6-overlay-preinit](https://github.com/just-containers/s6-overlay-preinit)
 
 ## Build locally
 
