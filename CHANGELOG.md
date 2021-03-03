@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0.3-r7 / 2.1.0.2-r11 (2021/03/03)
+
+* Create dist image (#19)
+* Add cache on ci (#20)
+
 ## 2.2.0.3-r6 / 2.1.0.2-r10 (2021/03/02)
 
 * No need gosu (see https://github.com/crazy-max/gosu#from-dockerfile)
