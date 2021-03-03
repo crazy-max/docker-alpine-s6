@@ -28,14 +28,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.alpine-s6-cache
-          key: ${{ runner.os }}-alpine-s6-test-${{ matrix.alpine_version }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-alpine-s6-test-${{ matrix.alpine_version }}-
-      -
         name: Prepare
         id: prep
         run: |
@@ -59,8 +51,6 @@ jobs:
           tags: ${{ steps.prep.outputs.base_image }}
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
-          cache-from: type=local,src=/tmp/.alpine-s6-cache/image
-          cache-to: type=local,dest=/tmp/.alpine-s6-cache-new/image
       -
         name: Build RRDCached
         uses: docker/build-push-action@v2
@@ -109,8 +99,6 @@ jobs:
           tags: ${{ steps.prep.outputs.base_image }}-dist
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
-          cache-from: type=local,src=/tmp/.alpine-s6-cache/image-dist
-          cache-to: type=local,dest=/tmp/.alpine-s6-cache-new/image-dist
       -
         name: Check dist content
         uses: docker/build-push-action@v2
@@ -125,9 +113,3 @@ jobs:
         run: |
           docker logs ${{ steps.prep.outputs.container_name }}
           docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
-      -
-        # FIXME: https://github.com/docker/build-push-action/issues/252
-        name: Move cache
-        run: |
-          rm -rf /tmp/.alpine-s6-cache
-          mv /tmp/.alpine-s6-cache-new /tmp/.alpine-s6-cache
