@@ -17,6 +17,8 @@ on:
 env:
   DOCKERHUB_SLUG: crazymax/alpine-s6
   GHCR_SLUG: ghcr.io/crazy-max/alpine-s6
+  DOCKERHUB_DIST_SLUG: crazymax/alpine-s6-dist
+  GHCR_DIST_SLUG: ghcr.io/crazy-max/alpine-s6-dist
   ALPINE_LATEST: 3.13
 
 jobs:
@@ -79,6 +81,21 @@ jobs:
             org.opencontainers.image.description=Alpine Linux with s6 overlay
             org.opencontainers.image.vendor=CrazyMax
       -
+        name: Docker meta dist
+        id: docker_meta_dist
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: |
+            ${{ env.DOCKERHUB_DIST_SLUG }}
+            ${{ env.GHCR_DIST_SLUG }}
+          tag-custom: |
+            ${{ env.IMAGE_TAGS }}
+          tag-custom-only: true
+          label-custom: |
+            org.opencontainers.image.title=alpine-s6-dist
+            org.opencontainers.image.description=s6 overlay
+            org.opencontainers.image.vendor=CrazyMax
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
@@ -127,6 +144,17 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.docker_meta.outputs.bake-file }}
           targets: image-all
+          push: ${{ github.event_name != 'pull_request' }}
+        env:
+          ALPINE_VERSION: ${{ matrix.alpine_version }}
+      -
+        name: Build dist
+        uses: docker/bake-action@v1
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.docker_meta_dist.outputs.bake-file }}
+          targets: image-dist-all
           push: ${{ github.event_name != 'pull_request' }}
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}

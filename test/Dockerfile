@@ -1,5 +1,5 @@
 ARG BASE_IMAGE
-FROM --platform=${TARGETPLATFORM:-linux/amd64} ${BASE_IMAGE:-test-alpine-s6} as builder
+FROM ${BASE_IMAGE:-test-alpine-s6} AS builder
 
 ENV TZ="UTC" \
   PUID="1000" \
@@ -9,7 +9,6 @@ RUN apk add --update --no-cache \
     bash \
     rrdtool-cached \
     shadow \
-    su-exec \
     tzdata \
   && addgroup -g ${PGID} rrdcached \
   && adduser -D -H -u ${PUID} -G rrdcached -s /bin/sh rrdcached \
