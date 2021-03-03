@@ -28,14 +28,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ matrix.alpine_version }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-${{ matrix.alpine_version }}-
-      -
         name: Prepare
         id: prep
         run: |
@@ -59,7 +51,6 @@ jobs:
           tags: ${{ steps.prep.outputs.base_image }}
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
-          cache-from: type=local,src=/tmp/.buildx-cache
       -
         name: Build RRDCached
         uses: docker/build-push-action@v2
