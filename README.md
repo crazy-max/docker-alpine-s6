@@ -26,7 +26,6 @@ ___
 * Multi-platform image
 * [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
 * [justc-installer](https://github.com/just-containers/justc-installer) included
-* [gosu](https://github.com/tianon/gosu) included
 
 ## Build locally
 
