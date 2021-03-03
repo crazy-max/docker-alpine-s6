@@ -42,7 +42,7 @@ jobs:
         with:
           driver: docker
       -
-        name: Build Alpine S6
+        name: Build Alpine s6
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -89,6 +89,24 @@ jobs:
           fi
 
           docker stop ${{ steps.prep.outputs.container_name }}
+      -
+        name: Build Alpine s6 dist
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: ${{ steps.prep.outputs.base_image }}-dist
+          build-args: |
+            ALPINE_VERSION=${{ matrix.alpine_version }}
+      -
+        name: Check dist content
+        uses: docker/build-push-action@v2
+        with:
+          context: ./test
+          file: ./test/dist.Dockerfile
+          build-args: |
+            DIST_IMAGE=${{ steps.prep.outputs.base_image }}-dist
       -
         name: Container logs
         if: always()

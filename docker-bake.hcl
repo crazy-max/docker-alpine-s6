@@ -52,3 +52,17 @@ target "image-local" {
 target "image-all" {
   inherits = ["platforms", "image"]
 }
+
+target "image-dist" {
+  inherits = ["image"]
+  target = "dist"
+}
+
+target "image-dist-local" {
+  inherits = ["image-dist"]
+  output = ["type=docker"]
+}
+
+target "image-dist-all" {
+  inherits = ["platforms", "image-dist"]
+}
