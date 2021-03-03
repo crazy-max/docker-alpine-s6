@@ -18,6 +18,7 @@ ___
 * [Features](#features)
 * [Build locally](#build-locally)
 * [Image](#image)
+* [Dist image](#dist-image)
 * [How can I help?](#how-can-i-help)
 * [License](#license)
 
@@ -38,6 +39,9 @@ docker buildx bake
 
 # Build multi-platform image
 docker buildx bake image-all
+
+# Build multi-platform dist image
+docker buildx bake image-dist-all
 
 # Build artifacts and output to ./dist
 docker buildx bake artifact-all
@@ -65,6 +69,15 @@ Image: crazymax/alpine-s6:latest
    - linux/ppc64le
    - linux/s390x
 ```
+
+## Dist image
+
+A distribution image is also available which only contains the required artifacts:
+
+| Registry                                                                                         | Image                           |
+|--------------------------------------------------------------------------------------------------|---------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/alpine-s6-dist/)                                            | `crazymax/alpine-s6-dist`                 |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6-dist)  | `ghcr.io/crazy-max/alpine-s6-dist`        |
 
 ## Supported tags
 
