@@ -169,6 +169,8 @@ jobs:
             ${{ steps.docker_meta_dist.outputs.bake-file }}
           targets: image-dist-all
           push: ${{ github.event_name != 'pull_request' }}
+          set: |
+            *.cache-from=type=local,src=/tmp/.buildx-cache-new
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
