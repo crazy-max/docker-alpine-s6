@@ -1,3 +1,5 @@
+ARG ALPINE_VERSION=latest
+
 ARG SKALIBS_VERSION=2.9.3.0
 ARG EXECLINE_VERSION=2.6.1.1
 ARG S6_VERSION=2.9.2.0
@@ -19,7 +21,7 @@ ARG SRC_PATH=/src
 ARG DIST_PATH=/dist
 ARG OUT_PATH=/out
 
-FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine AS download
+FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION} AS download
 ARG SRC_PATH
 RUN apk --update --no-cache add curl tar
 
@@ -75,11 +77,8 @@ RUN curl -sSL "https://github.com/just-containers/s6-overlay/releases/download/v
 
 ARG SOCKLOG_OVERLAY_VERSION
 ARG SOCKLOG_OVERLAY_RELEASE
-WORKDIR ${SRC_PATH}
-RUN wget -q "https://github.com/just-containers/socklog-overlay/archive/v${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}.zip" -qO "socklog-overlay.zip" \
-  && unzip socklog-overlay.zip \
-  && mv socklog-overlay-${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE} socklog-overlay \
-  && rm -f socklog-overlay.zip
+WORKDIR ${SRC_PATH}/socklog-overlay
+RUN curl -sSL "https://github.com/just-containers/socklog-overlay/archive/v${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}.tar.gz" | tar xz --strip 1
 
 ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION:-latest} as builder
@@ -89,7 +88,7 @@ RUN apk --update --no-cache add \
     bearssl-dev \
     build-base \
     curl \
-    rsync \
+    findutils \
     socklog \
     tar \
     tree
@@ -101,7 +100,6 @@ WORKDIR /tmp/skalibs
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
     --libdir=/usr/lib \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -111,7 +109,7 @@ WORKDIR /tmp/execline
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --libdir=/usr/lib \
     --with-dynlib=/lib \
   && make install -j$(nproc) \
@@ -123,7 +121,7 @@ COPY patchs/s6 .
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --libdir=/usr/lib \
     --libexecdir=/lib/s6 \
     --with-dynlib=/lib \
@@ -137,7 +135,7 @@ WORKDIR /tmp/s6-dns
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
     --libexecdir=/usr/lib/s6-dns \
@@ -150,7 +148,7 @@ WORKDIR /tmp/s6-linux-utils
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
   && make install -j$(nproc) \
@@ -161,7 +159,7 @@ WORKDIR /tmp/s6-networking
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
     --libexecdir=/usr/lib/s6-networking \
@@ -175,7 +173,7 @@ WORKDIR /tmp/s6-portable-utils
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
     --libdir=/usr/lib \
   && make install -j$(nproc) \
@@ -186,7 +184,7 @@ WORKDIR /tmp/s6-rc
 RUN ./configure \
     --enable-shared \
     --enable-static \
-    --enable-allstatic \
+    --disable-allstatic \
     --libdir=/usr/lib \
     --libexecdir=/lib/s6-rc \
     --with-dynlib=/lib \
@@ -197,7 +195,7 @@ RUN ./configure \
 WORKDIR /tmp/justc-envdir
 RUN ./configure \
     --enable-shared \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -206,7 +204,7 @@ RUN ./configure \
 WORKDIR /tmp/justc-installer
 RUN ./configure \
     --enable-shared \
-    --enable-allstatic \
+    --disable-allstatic \
     --prefix=/usr \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
@@ -215,29 +213,21 @@ RUN ./configure \
 WORKDIR /tmp/s6-overlay-preinit
 RUN ./configure \
     --enable-shared \
-    --enable-allstatic \
+    --disable-allstatic \
     --with-sysdeps=/usr/lib/skalibs/sysdeps \
-    -prefix=/ \
+    --prefix=/ \
   && make install -j$(nproc) \
   && make DESTDIR=${DIST_PATH} install -j$(nproc) \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-overlay
-RUN rsync -a ./ ${DIST_PATH}/
+RUN cp -Rf * ${DIST_PATH}/
 
 WORKDIR /tmp/socklog-overlay
-RUN rsync -a ./overlay-rootfs/ ${DIST_PATH}/ \
-  && mkdir -p \
-    ${DIST_PATH}/var/log/socklog/cron \
-    ${DIST_PATH}/var/log/socklog/daemon \
-    ${DIST_PATH}/var/log/socklog/debug \
-    ${DIST_PATH}/var/log/socklog/errors \
-    ${DIST_PATH}/var/log/socklog/everything \
-    ${DIST_PATH}/var/log/socklog/kernel \
-    ${DIST_PATH}/var/log/socklog/mail \
-    ${DIST_PATH}/var/log/socklog/messages \
-    ${DIST_PATH}/var/log/socklog/secure \
-    ${DIST_PATH}/var/log/socklog/user \
+RUN find "overlay-rootfs"/ -type f \
+    -exec sh -c 'test "$(head -c 16 "$1")" = "#!/bin/execlineb"' sh {} \; \
+    -exec chmod a+x {} \; \
+  && cp -Rf overlay-rootfs/* ${DIST_PATH}/ \
   && tree ${DIST_PATH}
 
 WORKDIR ${DIST_PATH}
@@ -259,7 +249,7 @@ ARG DIST_PATH
 COPY --from=builder ${DIST_PATH} /
 
 ARG ALPINE_VERSION
-FROM alpine:${ALPINE_VERSION:-latest}
+FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="CrazyMax"
 
 RUN apk --update --no-cache add \
