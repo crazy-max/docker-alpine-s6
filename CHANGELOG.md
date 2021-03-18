@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0.3-r8 / 2.1.0.2-r12 (2021/03/18)
+
+* Fix s6 tooling compil
+* Enhance Dockerfile
+* Wrong Alpine release used
+
 ## 2.2.0.3-r7 / 2.1.0.2-r11 (2021/03/03)
 
 * Create dist image (#19)
