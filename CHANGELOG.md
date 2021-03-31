@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r9 / 2.1.0.2-r13 (2021/04/01)
+
+* Upstream Alpine update
+
 ## 2.2.0.3-r8 / 2.1.0.2-r12 (2021/03/18)
 
 * Fix s6 tooling compil
