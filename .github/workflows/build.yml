@@ -46,7 +46,9 @@ jobs:
             ${{ runner.os }}-alpine-s6-${{ matrix.alpine_version }}-
       -
         name: Prepare
+        id: prep
         run: |
+          NL=$'\n'
           ALPINE_VERSION=${{ matrix.alpine_version }}
           VERSION=edge
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -55,51 +57,47 @@ jobs:
           fi
           IMAGE_TAGS=""
           if [[ $ALPINE_VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3} ]]; then
-            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION},"
+            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION}${NL}"
             if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
-              IMAGE_TAGS="${IMAGE_TAGS}latest-${VERSION},"
+              IMAGE_TAGS="${IMAGE_TAGS}latest-${VERSION}${NL}"
             fi
           else
             if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3} ]]; then
-              IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION},"
+              IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION}${NL}"
             else
-              IMAGE_TAGS="${IMAGE_TAGS}${VERSION},"
+              IMAGE_TAGS="${IMAGE_TAGS}${VERSION}${NL}"
             fi
           fi
           if [ "$VERSION" != "edge" ]; then
-            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION},"
+            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}${NL}"
             if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
-              IMAGE_TAGS="${IMAGE_TAGS}latest,"
+              IMAGE_TAGS="${IMAGE_TAGS}latest${NL}"
             fi
           fi
-          echo "IMAGE_TAGS=${IMAGE_TAGS}" >> $GITHUB_ENV
+          echo "::set-output name=tags::${IMAGE_TAGS}"
       -
         name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
-          tag-custom: |
-            ${{ env.IMAGE_TAGS }}
-          tag-custom-only: true
-          label-custom: |
+          tags: ${{ steps.prep.outputs.tags }}
+          labels: |
             org.opencontainers.image.title=alpine-s6
             org.opencontainers.image.description=Alpine Linux with s6 overlay
             org.opencontainers.image.vendor=CrazyMax
       -
         name: Docker meta dist
-        id: docker_meta_dist
-        uses: crazy-max/ghaction-docker-meta@v1
+        id: meta_dist
+        uses: crazy-max/ghaction-docker-meta@v2
         with:
           images: |
             ${{ env.DOCKERHUB_DIST_SLUG }}
             ${{ env.GHCR_DIST_SLUG }}
-          tag-custom: |
-            ${{ env.IMAGE_TAGS }}
-          tag-custom-only: true
-          label-custom: |
+          tags: ${{ steps.prep.outputs.tags }}
+          labels: |
             org.opencontainers.image.title=alpine-s6-dist
             org.opencontainers.image.description=s6 overlay
             org.opencontainers.image.vendor=CrazyMax
@@ -153,7 +151,7 @@ jobs:
         with:
           files: |
             ./docker-bake.hcl
-            ${{ steps.docker_meta.outputs.bake-file }}
+            ${{ steps.meta.outputs.bake-file }}
           targets: image-all
           push: ${{ github.event_name != 'pull_request' }}
           set: |
@@ -167,7 +165,7 @@ jobs:
         with:
           files: |
             ./docker-bake.hcl
-            ${{ steps.docker_meta_dist.outputs.bake-file }}
+            ${{ steps.meta_dist.outputs.bake-file }}
           targets: image-dist-all
           push: ${{ github.event_name != 'pull_request' }}
           set: |
@@ -190,16 +188,16 @@ jobs:
         name: Check manifest
         if: github.event_name != 'pull_request'
         run: |
-          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         name: Check pull
         if: github.event_name != 'pull_request'
         run: |
-          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker pull ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
-          docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.docker_meta.outputs.version }}
+          docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
+          docker pull ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
+          docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         # FIXME: https://github.com/docker/build-push-action/issues/252
         name: Move cache
