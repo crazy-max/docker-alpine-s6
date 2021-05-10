@@ -21,8 +21,8 @@ target "platforms" {
   ]
 }
 
-// Special target: https://github.com/crazy-max/ghaction-docker-meta#bake-definition
-target "ghaction-docker-meta" {
+// Special target: https://github.com/docker/metadata-action#bake-definition
+target "docker-metadata-action" {
   tags = ["alpine-s6:local"]
 }
 
@@ -41,7 +41,7 @@ target "artifact-all" {
 }
 
 target "image" {
-  inherits = ["args", "ghaction-docker-meta"]
+  inherits = ["args", "docker-metadata-action"]
 }
 
 target "image-local" {
