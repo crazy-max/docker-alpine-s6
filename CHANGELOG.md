@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0.3-r11 / 2.1.0.2-r15 (2021/06/26)
+
+* Upstream Alpine update
+* Move to `docker/metadata-action`
+
 ## 2.2.0.3-r10 / 2.1.0.2-r14 (2021/04/14)
 
 * Upstream Alpine update
