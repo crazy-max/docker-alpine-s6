@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0.3-r12 (2021/07/03)
+
+* Alpine Linux 3.14
+* Drop Alpine Linux 3.11 support
+* Drop s6 2.1 support
+
 ## 2.2.0.3-r11 / 2.1.0.2-r15 (2021/06/26)
 
 * Upstream Alpine update
