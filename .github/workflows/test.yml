@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - alpine_version: 3.11
           - alpine_version: 3.12
           - alpine_version: 3.13
+          - alpine_version: 3.14
           - alpine_version: edge
     runs-on: ubuntu-latest
     steps:
