@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0.3-r13 (2021/08/06)
+
+* Upstream Alpine update
+* Update socklog and s6 libs (#32)
+
 ## 2.2.0.3-r12 (2021/07/03)
 
 * Alpine Linux 3.14
