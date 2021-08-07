@@ -127,6 +127,7 @@ jobs:
         uses: docker/bake-action@v1
         with:
           targets: artifact-all
+          pull: true
           set: |
             *.cache-from=type=local,src=/tmp/.alpine-s6-cache/artifacts
             *.cache-to=type=local,dest=/tmp/.alpine-s6-cache-new/artifacts
@@ -167,6 +168,7 @@ jobs:
             ./docker-bake.hcl
             ${{ steps.meta_dist.outputs.bake-file }}
           targets: image-dist-all
+          pull: true
           push: ${{ github.event_name != 'pull_request' }}
           set: |
             *.cache-from=type=local,src=/tmp/.alpine-s6-cache/image-dist
