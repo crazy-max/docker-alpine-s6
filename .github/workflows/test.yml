@@ -61,7 +61,6 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ steps.prep.outputs.base_image }}
           load: true
-          pull: true
           tags: ${{ steps.prep.outputs.build_tag }}
       -
         name: Start RRDCached
@@ -108,7 +107,6 @@ jobs:
         with:
           context: ./test
           file: ./test/dist.Dockerfile
-          pull: true
           build-args: |
             DIST_IMAGE=${{ steps.prep.outputs.base_image }}-dist
       -
