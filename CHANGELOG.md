@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0.3-r13 (2021/08/06)
+## 2.2.0.3-r13 (2021/08/29)
 
 * Upstream Alpine update
 * Update socklog and s6 libs (#32)
