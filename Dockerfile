@@ -19,77 +19,77 @@ ARG SOCKLOG_OVERLAY_RELEASE=-0
 ARG S6_OVERLAY_PREINIT_VERSION=1.0.5
 ARG S6_OVERLAY_VERSION=2.2.0.3
 
-ARG SRC_PATH=/src
 ARG DIST_PATH=/dist
 ARG OUT_PATH=/out
 
-FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION} AS download
-ARG SRC_PATH
-
-ARG SKALIBS_VERSION
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS download
 RUN apk --update --no-cache add curl tar
-WORKDIR ${SRC_PATH}/skalibs
+WORKDIR /dl
+
+FROM download AS dl-skalibs
+ARG SKALIBS_VERSION
 RUN curl -sSL "https://skarnet.org/software/skalibs/skalibs-${SKALIBS_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-execline
 ARG EXECLINE_VERSION
-WORKDIR ${SRC_PATH}/execline
 RUN curl -sSL "https://skarnet.org/software/execline/execline-${EXECLINE_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6
 ARG S6_VERSION
-WORKDIR ${SRC_PATH}/s6
 RUN curl -sSL "https://skarnet.org/software/s6/s6-${S6_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6dns
 ARG S6_DNS_VERSION
-WORKDIR ${SRC_PATH}/s6-dns
 RUN curl -sSL "https://skarnet.org/software/s6-dns/s6-dns-${S6_DNS_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6linuxutils
 ARG S6_LINUX_UTILS_VERSION
-WORKDIR ${SRC_PATH}/s6-linux-utils
 RUN curl -sSL "https://skarnet.org/software/s6-linux-utils/s6-linux-utils-${S6_LINUX_UTILS_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6networking
 ARG S6_NETWORKING_VERSION
-WORKDIR ${SRC_PATH}/s6-networking
 RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NETWORKING_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6portableutils
 ARG S6_PORTABLE_UTILS_VERSION
-WORKDIR ${SRC_PATH}/s6-portable-utils
 RUN curl -sSL "https://skarnet.org/software/s6-portable-utils/s6-portable-utils-${S6_PORTABLE_UTILS_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6rc
 ARG S6_RC_VERSION
-WORKDIR ${SRC_PATH}/s6-rc
 RUN curl -sSL "https://skarnet.org/software/s6-rc/s6-rc-${S6_RC_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-justcenvdir
 ARG JUSTC_ENVDIR_VERSION
 ARG JUSTC_ENVDIR_RELEASE
-WORKDIR ${SRC_PATH}/justc-envdir
 RUN curl -sSL "https://github.com/just-containers/justc-envdir/releases/download/v${JUSTC_ENVDIR_VERSION}${JUSTC_ENVDIR_RELEASE}/justc-envdir-${JUSTC_ENVDIR_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-justcinstaller
 ARG JUSTC_INSTALLER_VERSION
 ARG JUSTC_INSTALLER_RELEASE
-WORKDIR ${SRC_PATH}/justc-installer
 RUN curl -sSL "https://github.com/just-containers/justc-installer/releases/download/v${JUSTC_INSTALLER_VERSION}${JUSTC_INSTALLER_RELEASE}/justc-installer-${JUSTC_INSTALLER_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-socklog
 ARG SOCKLOG_VERSION
 ARG SOCKLOG_RELEASE
-WORKDIR ${SRC_PATH}/socklog
 RUN curl -sSL "https://github.com/just-containers/socklog/releases/download/v${SOCKLOG_VERSION}${SOCKLOG_RELEASE}/socklog-${SOCKLOG_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6overlaypreinit
 ARG S6_OVERLAY_PREINIT_VERSION
-WORKDIR ${SRC_PATH}/s6-overlay-preinit
 RUN curl -sSL "https://github.com/just-containers/s6-overlay-preinit/releases/download/v${S6_OVERLAY_PREINIT_VERSION}/s6-overlay-preinit-${S6_OVERLAY_PREINIT_VERSION}.tar.gz" | tar xz --strip 1
 
+FROM download AS dl-s6overlay
 ARG S6_OVERLAY_VERSION
-WORKDIR ${SRC_PATH}/s6-overlay
 RUN curl -sSL "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-nobin.tar.gz" | tar -xz
 
+FROM download AS dl-socklogoverlay
 ARG SOCKLOG_OVERLAY_VERSION
 ARG SOCKLOG_OVERLAY_RELEASE
-WORKDIR ${SRC_PATH}/socklog-overlay
 RUN curl -sSL "https://github.com/just-containers/socklog-overlay/archive/v${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}.tar.gz" | tar xz --strip 1
 
-ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION} AS builder
-
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
 ARG DIST_PATH
 RUN apk --update --no-cache add \
     bearssl-dev \
@@ -100,10 +100,8 @@ RUN apk --update --no-cache add \
     tar \
     tree
 
-ARG SRC_PATH
-COPY --from=download ${SRC_PATH} /tmp
-
 WORKDIR /tmp/skalibs
+COPY --from=dl-skalibs /dl .
 COPY patchs/skalibs .
 RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
   && ./configure \
@@ -117,6 +115,7 @@ RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/execline
+COPY --from=dl-execline /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -128,6 +127,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6
+COPY --from=dl-s6 /dl .
 COPY patchs/s6 .
 RUN ./configure \
     --enable-shared \
@@ -144,7 +144,8 @@ RUN ./configure \
   && cp s6.initd "${DIST_PATH}/etc/init.d/s6" \
   && tree ${DIST_PATH}
 
-WORKDIR /tmp/s6-dns
+WORKDIR /tmp/s6dns
+COPY --from=dl-s6dns /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -158,6 +159,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-linux-utils
+COPY --from=dl-s6linuxutils /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -169,6 +171,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-networking
+COPY --from=dl-s6networking /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -183,6 +186,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-portable-utils
+COPY --from=dl-s6portableutils /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -194,6 +198,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-rc
+COPY --from=dl-s6rc /dl .
 RUN ./configure \
     --enable-shared \
     --enable-static \
@@ -206,6 +211,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/justc-envdir
+COPY --from=dl-justcenvdir /dl .
 RUN ./configure \
     --enable-shared \
     --disable-allstatic \
@@ -215,6 +221,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/justc-installer
+COPY --from=dl-justcinstaller /dl .
 RUN ./configure \
     --enable-shared \
     --disable-allstatic \
@@ -224,6 +231,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/socklog
+COPY --from=dl-socklog /dl .
 RUN ./configure \
     --enable-shared \
     --disable-allstatic \
@@ -233,6 +241,7 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-overlay-preinit
+COPY --from=dl-s6overlaypreinit /dl .
 RUN ./configure \
     --enable-shared \
     --disable-allstatic \
@@ -243,9 +252,11 @@ RUN ./configure \
   && tree ${DIST_PATH}
 
 WORKDIR /tmp/s6-overlay
+COPY --from=dl-s6overlay /dl .
 RUN cp -Rf * ${DIST_PATH}/
 
 WORKDIR /tmp/socklog-overlay
+COPY --from=dl-socklogoverlay /dl .
 RUN find "overlay-rootfs"/ -type f \
     -exec sh -c 'test "$(head -c 16 "$1")" = "#!/bin/execlineb"' sh {} \; \
     -exec chmod a+x {} \; \
@@ -253,9 +264,6 @@ RUN find "overlay-rootfs"/ -type f \
   && tree ${DIST_PATH}
 
 WORKDIR ${DIST_PATH}
-ARG TARGETOS
-ARG TARGETARCH
-ARG TARGETVARIANT
 ARG S6_OVERLAY_VERSION
 ARG OUT_PATH
 RUN mkdir -p ${OUT_PATH} \
@@ -270,14 +278,10 @@ FROM scratch AS dist
 ARG DIST_PATH
 COPY --from=builder ${DIST_PATH} /
 
-ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION}
-
 ARG DIST_PATH
 COPY --from=builder ${DIST_PATH} /
-
 RUN apk --update --no-cache add \
     bearssl \
   && s6-rmrf /var/cache/apk/* /tmp/*
-
 ENTRYPOINT ["/init"]
