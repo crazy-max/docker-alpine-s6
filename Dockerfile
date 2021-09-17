@@ -1,4 +1,5 @@
 ARG ALPINE_VERSION=latest
+ARG XX_VERSION=1.0.0-rc.2
 
 ARG SKALIBS_VERSION=2.10.0.3
 ARG EXECLINE_VERSION=2.7.0.1
@@ -86,25 +87,36 @@ ARG SOCKLOG_OVERLAY_VERSION
 ARG SOCKLOG_OVERLAY_RELEASE
 RUN curl -sSL "https://github.com/just-containers/socklog-overlay/archive/v${SOCKLOG_OVERLAY_VERSION}${SOCKLOG_OVERLAY_RELEASE}.tar.gz" | tar xz --strip 1
 
-FROM alpine:${ALPINE_VERSION} AS builder
-ARG TARGETOS
-ARG TARGETARCH
-ARG TARGETVARIANT
-ARG DIST_PATH
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS builder
+COPY --from=xx / /
 RUN apk --update --no-cache add \
-    bearssl-dev \
-    build-base \
+    clang \
     curl \
+    file \
     findutils \
-    linux-headers \
+    make \
+    pkgconf \
     tar \
     tree
+
+ARG TARGETPLATFORM
+ARG DIST_PATH
+ENV XX_CC_PREFER_LINKER=ld
+RUN xx-apk --update --no-cache add \
+    bearssl-dev \
+    g++ \
+    gettext-dev \
+    libc-dev \
+    linux-headers
 
 WORKDIR /tmp/skalibs
 COPY --from=dl-skalibs /dl .
 COPY patchs/skalibs .
 RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
   && ./configure \
+    --host=$(xx-clang --print-target-triple) \
+    --with-sysdep-devurandom=yes \
     --enable-shared \
     --enable-static \
     --libdir=/usr/lib \
@@ -117,6 +129,7 @@ RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
 WORKDIR /tmp/execline
 COPY --from=dl-execline /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -130,6 +143,7 @@ WORKDIR /tmp/s6
 COPY --from=dl-s6 /dl .
 COPY patchs/s6 .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -147,6 +161,7 @@ RUN ./configure \
 WORKDIR /tmp/s6dns
 COPY --from=dl-s6dns /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -161,6 +176,7 @@ RUN ./configure \
 WORKDIR /tmp/s6-linux-utils
 COPY --from=dl-s6linuxutils /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -173,6 +189,7 @@ RUN ./configure \
 WORKDIR /tmp/s6-networking
 COPY --from=dl-s6networking /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -188,6 +205,7 @@ RUN ./configure \
 WORKDIR /tmp/s6-portable-utils
 COPY --from=dl-s6portableutils /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -200,6 +218,7 @@ RUN ./configure \
 WORKDIR /tmp/s6-rc
 COPY --from=dl-s6rc /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --enable-static \
     --disable-allstatic \
@@ -213,6 +232,7 @@ RUN ./configure \
 WORKDIR /tmp/justc-envdir
 COPY --from=dl-justcenvdir /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --disable-allstatic \
     --prefix=/usr \
@@ -223,6 +243,7 @@ RUN ./configure \
 WORKDIR /tmp/justc-installer
 COPY --from=dl-justcinstaller /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --disable-allstatic \
     --prefix=/usr \
@@ -233,6 +254,7 @@ RUN ./configure \
 WORKDIR /tmp/socklog
 COPY --from=dl-socklog /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --disable-allstatic \
     --prefix=/usr \
@@ -243,6 +265,7 @@ RUN ./configure \
 WORKDIR /tmp/s6-overlay-preinit
 COPY --from=dl-s6overlaypreinit /dl .
 RUN ./configure \
+    --host=$(xx-clang --print-target-triple) \
     --enable-shared \
     --disable-allstatic \
     --with-sysdeps=/usr/lib/skalibs/sysdeps \
@@ -264,6 +287,9 @@ RUN find "overlay-rootfs"/ -type f \
   && tree ${DIST_PATH}
 
 WORKDIR ${DIST_PATH}
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
 ARG S6_OVERLAY_VERSION
 ARG OUT_PATH
 RUN mkdir -p ${OUT_PATH} \
