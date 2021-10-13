@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=latest
 
 ARG SKALIBS_VERSION=2.10.0.3
-ARG EXECLINE_VERSION=2.7.0.1
+ARG EXECLINE_VERSION=2.8.0.1
 ARG S6_VERSION=2.10.0.3
 ARG S6_DNS_VERSION=2.3.5.1
 ARG S6_LINUX_UTILS_VERSION=2.5.1.5
@@ -116,6 +116,8 @@ RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
 
 WORKDIR /tmp/execline
 COPY --from=dl-execline /dl .
+COPY patchs/execline .
+RUN find . -type f -name '*.patch' -print0 | xargs -0 patch -p1
 RUN ./configure \
     --enable-shared \
     --enable-static \
