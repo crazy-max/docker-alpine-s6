@@ -283,5 +283,5 @@ ARG DIST_PATH
 COPY --from=builder ${DIST_PATH} /
 RUN apk --update --no-cache add \
     bearssl \
-  && s6-rmrf /var/cache/apk/* /tmp/*
+  && s6-rmrf /tmp/*
 ENTRYPOINT ["/init"]

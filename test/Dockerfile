@@ -12,7 +12,7 @@ RUN apk add --update --no-cache \
     tzdata \
   && addgroup -g ${PGID} rrdcached \
   && adduser -D -H -u ${PUID} -G rrdcached -s /bin/sh rrdcached \
-  && rm -rf /tmp/* /var/cache/apk/*
+  && rm -rf /tmp/*
 
 COPY rootfs /
 
