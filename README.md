@@ -97,15 +97,14 @@ A distribution image is also available which only contains the required artifact
 ## Supported tags
 
 * `edge`, `edge-x.x.x.x`
-* `latest-edge`, `3.14-edge`
-* `latest`, `latest-x.x.x.x`, `3.14`, `3.14-x.x.x.x`
-* `3.14-x.x.x.x`, `latest-x.x.x.x`
+* `latest-edge`, `3.15-edge`
+* `latest`, `latest-x.x.x.x`, `3.15`, `3.15-x.x.x.x`
+* `3.14-edge`
+* `3.14`, `3.14-x.x.x.x`
 * `3.13-edge`
 * `3.13`, `3.13-x.x.x.x`
-* `3.13-x.x.x.x`
 * `3.12-edge`
 * `3.12`, `3.12-x.x.x.x`
-* `3.12-x.x.x.x`
 
 > `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `2.2.0.3`).
 
