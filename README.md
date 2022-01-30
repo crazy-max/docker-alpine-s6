@@ -16,60 +16,54 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 ___
 
 * [Features](#features)
-* [Build locally](#build-locally)
-* [Image](#image)
+* [Usage](#usage)
+* [Alpine image](#alpine-image)
 * [Dist image](#dist-image)
+* [Supported tags](#supported-tags)
+* [Build](#build)
 * [Contributing](#contributing)
 * [License](#license)
 
 ## Features
 
-* Multi-platform image
+* Multi-platform [alpine based](#alpine-image) and [distribution](#dist-image) images
 * Artifacts provided on [releases page](https://github.com/crazy-max/docker-alpine-s6/releases)
-* Multi-platform [distribution image](#dist-image)
-* [socklog-overlay](https://github.com/just-containers/socklog-overlay) included
-* Compiled from source:
-  * [skalibs](https://github.com/skarnet/skalibs)
-  * [execline](https://github.com/skarnet/execline)
-  * [s6](https://github.com/skarnet/s6)
-  * [s6-dns](https://github.com/skarnet/s6-dns)
-  * [s6-linux-utils](https://github.com/skarnet/s6-linux-utils)
-  * [s6-networking](https://github.com/skarnet/s6-networking)
-  * [s6-dns](https://github.com/skarnet/s6-dns)
-  * [s6-portable-utils](https://github.com/skarnet/s6-portable-utils)
-  * [s6-rc](https://github.com/skarnet/s6-rc)
-  * [justc-envdir](https://github.com/just-containers/justc-envdir)
-  * [justc-installer](https://github.com/just-containers/justc-installer)
-  * [socklog](https://github.com/just-containers/socklog)
-  * [s6-overlay-preinit](https://github.com/just-containers/s6-overlay-preinit)
 
-## Build locally
+## Usage
 
-```shell
-git clone https://github.com/crazy-max/docker-alpine-s6.git
-cd docker-alpine-s6
+This repository provides two images. The first one is built on top of alpine
+so, you can use it as a base image for your own images:
 
-# Build image and output to docker (default)
-docker buildx bake
-
-# Build multi-platform image
-docker buildx bake image-all
-
-# Build multi-platform dist image
-docker buildx bake image-dist-all
-
-# Build artifacts and output to ./dist
-docker buildx bake artifact-all
+```dockerfile
+FROM crazymax/alpine-s6:3.15
+RUN apk add --no-cache nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+CMD ["/usr/sbin/nginx"]
 ```
 
-## Image
+> Note: `ENTRYPOINT ["/init"]` is already defined in the base image so no need
+> to add this command.
+
+The second one is a [distribution image](#dist-image). This is a
+multi-platform scratch image that only contains all the scripts and binaries
+needed to run s6-overlay. This way you can use any base image and use the
+`COPY --from` command to copy the assets inside your image:
+
+```dockerfile
+FROM ubuntu
+COPY --from=crazymax/alpine-s6-dist:3.15 / /
+RUN apt-get update && apt-get install -y nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+CMD ["/usr/sbin/nginx"]
+ENTRYPOINT ["/init"]
+```
+
+## Alpine image
 
 | Registry                                                                                         | Image                           |
 |--------------------------------------------------------------------------------------------------|---------------------------------|
 | [Docker Hub](https://hub.docker.com/r/crazymax/alpine-s6/)                                            | `crazymax/alpine-s6`                 |
 | [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6)  | `ghcr.io/crazy-max/alpine-s6`        |
-
-Following platforms for this image are available:
 
 ```
 $ docker run --rm mplatform/mquery crazymax/alpine-s6:latest
@@ -87,12 +81,24 @@ Image: crazymax/alpine-s6:latest
 
 ## Dist image
 
-A distribution image is also available which only contains the required artifacts:
-
 | Registry                                                                                         | Image                           |
 |--------------------------------------------------------------------------------------------------|---------------------------------|
 | [Docker Hub](https://hub.docker.com/r/crazymax/alpine-s6-dist/)                                            | `crazymax/alpine-s6-dist`                 |
 | [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6-dist)  | `ghcr.io/crazy-max/alpine-s6-dist`        |
+
+```
+$ docker run --rm mplatform/mquery crazymax/alpine-s6-dist:latest
+Image: crazymax/alpine-s6-dist:latest
+ * Manifest List: Yes
+ * Supported platforms:
+   - linux/amd64
+   - linux/arm/v6
+   - linux/arm/v7
+   - linux/arm64
+   - linux/386
+   - linux/ppc64le
+   - linux/s390x
+```
 
 ## Supported tags
 
@@ -107,6 +113,25 @@ A distribution image is also available which only contains the required artifact
 * `3.12`, `3.12-x.x.x.x`
 
 > `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `2.2.0.3`).
+
+## Build
+
+```shell
+git clone https://github.com/crazy-max/docker-alpine-s6.git
+cd docker-alpine-s6
+
+# Build image and output to docker (default)
+docker buildx bake
+
+# Build tarballs to ./dist
+docker buildx bake artifact-all
+
+# Build multi-platform image
+docker buildx bake image-all
+
+# Build multi-platform dist image
+docker buildx bake image-dist-all
+```
 
 ## Contributing
 
