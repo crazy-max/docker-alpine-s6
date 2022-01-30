@@ -82,10 +82,6 @@ FROM src AS src-s6networking
 ARG S6_NETWORKING_VERSION
 RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NETWORKING_VERSION}.tar.gz" | tar xz --strip 1
 
-FROM src AS src-s6networking
-ARG S6_NETWORKING_VERSION
-RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NETWORKING_VERSION}.tar.gz" | tar xz --strip 1
-
 FROM src AS src-s6overlayhelpers
 ARG S6_OVERLAY_HELPERS_VERSION
 RUN <<EOT
