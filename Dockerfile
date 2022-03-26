@@ -1,23 +1,23 @@
-# syntax=docker/dockerfile:1-labs
+# syntax=docker/dockerfile:1
 
 ARG ALPINE_VERSION="latest"
 ARG XX_VERSION="1.1.0"
 
 # https://github.com/just-containers/s6-overlay/commit/25daa0113b8175f50def8c0aa365a34117fb4fae
-ARG S6_OVERLAY_VERSION="3.0.0.2"
-ARG S6_OVERLAY_REF="25daa0113b8175f50def8c0aa365a34117fb4fae"
+ARG S6_OVERLAY_VERSION="3.1.0.1"
+ARG S6_OVERLAY_REF="794f70faedb553e6166e4d286ab998d468466ce2"
 
 # https://bearssl.org/gitweb/?p=BearSSL;a=commit;h=79b1a9996c094ff593ae50bc4edc1f349f39dd6d
 ARG BEARSSL_VERSION="0.6"
 ARG BEARSSL_REF="79b1a9996c094ff593ae50bc4edc1f349f39dd6d"
 
-ARG SKALIBS_VERSION="2.11.1.0"
-ARG EXECLINE_VERSION="2.8.2.0"
+ARG SKALIBS_VERSION="2.11.2.0"
+ARG EXECLINE_VERSION="2.8.3.0"
 
-ARG S6_VERSION="2.11.0.1"
+ARG S6_VERSION="2.11.1.0"
 ARG S6_RC_VERSION="0.5.3.0"
-ARG S6_LINUX_INIT_VERSION="1.0.7.1"
-ARG S6_PORTABLE_UTILS_VERSION="2.2.3.4"
+ARG S6_LINUX_INIT_VERSION="1.0.7.3"
+ARG S6_PORTABLE_UTILS_VERSION="2.2.4.0"
 ARG S6_LINUX_UTILS_VERSION="2.5.1.7"
 ARG S6_DNS_VERSION="2.3.5.3"
 ARG S6_NETWORKING_VERSION="2.5.1.0"
@@ -217,7 +217,6 @@ done
 find ./layout/rootfs-overlay -type f -size +0c -print | xargs sed -i -e "s|@SHEBANGDIR@|/command|g; s/@VERSION@/$S6_OVERLAY_VERSION/g;" --
 (cd /out/package/admin/ ; ln -s s6-overlay-$S6_OVERLAY_VERSION s6-overlay)
 cp -rf ./layout/rootfs-overlay/* /out/
-echo "/command:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" > /out/etc/s6-overlay/config/global_path
 
 # s6-syslogd-overlay
 find ./layout/syslogd-overlay -type f -name .empty -print | xargs rm -f --
