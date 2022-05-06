@@ -43,7 +43,7 @@ jobs:
           echo "RUNNIN_LOG_CHECK=$(cat ./test/${{ matrix.target }}/logcheck.txt)" >> $GITHUB_ENV
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           driver: docker
       -
