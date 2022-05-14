@@ -1,9 +1,14 @@
 name: build
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
       - 'master'
+      - 'releases/*'
     tags:
       - '*'
     paths-ignore:
@@ -11,6 +16,7 @@ on:
   pull_request:
     branches:
       - 'master'
+      - 'releases/*'
     paths-ignore:
       - '**.md'
 
@@ -26,60 +32,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - alpine_version: 3.12
-          - alpine_version: 3.13
-          - alpine_version: 3.14
-          - alpine_version: 3.15
-          - alpine_version: edge
+        alpine_version:
+          - 3.12
+          - 3.13
+          - 3.14
+          - 3.15
+          - edge
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.alpine-s6-cache
-          key: ${{ runner.os }}-alpine-s6-${{ matrix.alpine_version }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-alpine-s6-${{ matrix.alpine_version }}-
+        uses: actions/checkout@v3
       -
         name: Prepare
         id: prep
         run: |
-          NL=$'\n'
           ALPINE_VERSION=${{ matrix.alpine_version }}
-          VERSION=edge
+          IMAGE_TAGS=
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
             VERSION=${TAG%-r*}
-          fi
-          IMAGE_TAGS=""
-          if [[ $ALPINE_VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3} ]]; then
-            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION}${NL}"
-            if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
-              IMAGE_TAGS="${IMAGE_TAGS}latest-${VERSION}${NL}"
-            fi
-          else
-            if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3} ]]; then
-              IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}-${VERSION}${NL}"
-            else
-              IMAGE_TAGS="${IMAGE_TAGS}${VERSION}${NL}"
-            fi
-          fi
-          if [ "$VERSION" != "edge" ]; then
-            IMAGE_TAGS="${IMAGE_TAGS}${ALPINE_VERSION}${NL}"
-            if [ "$ALPINE_VERSION" = "${{ env.ALPINE_LATEST }}" ]; then
-              IMAGE_TAGS="${IMAGE_TAGS}latest${NL}"
-            fi
+            IMAGE_TAGS="${ALPINE_VERSION}-${VERSION}"
           fi
           echo "::set-output name=tags::${IMAGE_TAGS}"
       -
         name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
@@ -92,7 +71,7 @@ jobs:
       -
         name: Docker meta dist
         id: meta_dist
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ${{ env.DOCKERHUB_DIST_SLUG }}
@@ -104,38 +83,38 @@ jobs:
             org.opencontainers.image.vendor=CrazyMax
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           config-inline: |
             [worker.oci]
               max-parallelism = 4
       -
         name: Login to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Login to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build artifacts
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v2
         with:
           targets: artifact-all
           pull: true
           set: |
-            *.cache-from=type=local,src=/tmp/.alpine-s6-cache/artifacts
-            *.cache-to=type=local,dest=/tmp/.alpine-s6-cache-new/artifacts
+            *.cache-from=type=gha,scope=22-artifacts
+            *.cache-to=type=gha,scope=22-artifacts,mode=max
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
@@ -153,31 +132,25 @@ jobs:
           if-no-files-found: error
       -
         name: Build image
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v2
         with:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
           targets: image-all
-          push: ${{ github.event_name != 'pull_request' }}
-          set: |
-            *.cache-from=type=local,src=/tmp/.alpine-s6-cache/image
-            *.cache-to=type=local,dest=/tmp/.alpine-s6-cache-new/image
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
         name: Build dist
-        uses: docker/bake-action@v1
+        uses: docker/bake-action@v2
         with:
           files: |
             ./docker-bake.hcl
             ${{ steps.meta_dist.outputs.bake-file }}
           targets: image-dist-all
           pull: true
-          push: ${{ github.event_name != 'pull_request' }}
-          set: |
-            *.cache-from=type=local,src=/tmp/.alpine-s6-cache/image-dist
-            *.cache-to=type=local,dest=/tmp/.alpine-s6-cache-new/image-dist
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
@@ -193,21 +166,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Check manifest
-        if: github.event_name != 'pull_request'
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           docker buildx imagetools inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
           docker buildx imagetools inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
       -
         name: Check pull
-        if: github.event_name != 'pull_request'
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           docker pull ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
           docker image inspect ${{ env.DOCKERHUB_SLUG }}:${{ steps.meta.outputs.version }}
           docker pull ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
           docker image inspect ${{ env.GHCR_SLUG }}:${{ steps.meta.outputs.version }}
-      -
-        # FIXME: https://github.com/docker/build-push-action/issues/252
-        name: Move cache
-        run: |
-          rm -rf /tmp/.alpine-s6-cache
-          mv /tmp/.alpine-s6-cache-new /tmp/.alpine-s6-cache
