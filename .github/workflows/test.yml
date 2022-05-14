@@ -4,115 +4,120 @@ on:
   push:
     branches:
       - 'master'
+      - 'releases/*'
     paths-ignore:
       - '**.md'
   pull_request:
     branches:
       - 'master'
+      - 'releases/*'
     paths-ignore:
       - '**.md'
+
+env:
+  BUILD_TAG: test
+  BASE_IMAGE: test-alpine-s6
+  RUNNING_TIMEOUT: 120
 
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - alpine_version: 3.12
-          - alpine_version: 3.13
-          - alpine_version: 3.14
-          - alpine_version: 3.15
-          - alpine_version: edge
+        target:
+          - pureftpd
+          - rrdtool
+        alpine_version:
+          - 3.12
+          - 3.13
+          - 3.14
+          - 3.15
+          - edge
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Prepare
-        id: prep
         run: |
-          echo ::set-output name=base_image::test-alpine-s6
-          echo ::set-output name=build_tag::test
-          echo ::set-output name=container_name::rrdcached
-          echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::listening for connections
+          echo "CONTAINER_NAME=${{ matrix.target }}" >> $GITHUB_ENV
+          echo "RUNNING_LOG_CHECK=$(cat ./test/${{ matrix.target }}/logcheck.txt)" >> $GITHUB_ENV
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           driver: docker
       -
-        name: Build Alpine s6
-        uses: docker/build-push-action@v2
+        name: Build image
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           load: true
           pull: true
-          tags: ${{ steps.prep.outputs.base_image }}
+          tags: ${{ env.BASE_IMAGE }}
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
-        name: Build RRDCached
-        uses: docker/build-push-action@v2
+        name: Build ${{ matrix.target }}
+        uses: docker/build-push-action@v3
         with:
-          context: ./test
-          file: ./test/Dockerfile
+          context: ./test/${{ matrix.target }}
           build-args: |
-            BASE_IMAGE=${{ steps.prep.outputs.base_image }}
+            BASE_IMAGE=${{ env.BASE_IMAGE }}
           load: true
-          tags: ${{ steps.prep.outputs.build_tag }}
+          tags: ${{ env.BUILD_TAG }}
       -
-        name: Start RRDCached
+        name: Start ${{ matrix.target }}
         run: |
-          docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
-          docker run -d --name ${{ steps.prep.outputs.container_name }} ${{ steps.prep.outputs.build_tag }}
+          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
+          docker run -d --name ${{ env.CONTAINER_NAME }} ${{ env.BUILD_TAG }}
       -
         name: Test run
         run: |
-          TIMEOUT=$((SECONDS + ${{ steps.prep.outputs.running_timeout }}))
+          TIMEOUT=$((SECONDS + ${{ env.RUNNING_TIMEOUT }}))
           while read LOGLINE; do
             echo ${LOGLINE}
-            if [[ ${LOGLINE} == *"${{ steps.prep.outputs.running_log_check }}"* ]]; then
+            if [[ ${LOGLINE} == *"${{ env.RUNNING_LOG_CHECK }}"* ]]; then
               echo "🎉 Container up!"
               break
             fi
             if [[ $SECONDS -gt ${TIMEOUT} ]]; then
-              >&2 echo "❌ Failed to run ${{ steps.prep.outputs.container_name }} container"
+              >&2 echo "❌ Failed to run ${{ env.CONTAINER_NAME }} container"
               exit 1
             fi
-          done < <(docker logs -f ${{ steps.prep.outputs.container_name }} 2>&1)
+          done < <(docker logs -f ${{ env.CONTAINER_NAME }} 2>&1)
 
-          CONTAINER_STATUS=$(docker container inspect --format "{{.State.Status}}" ${{ steps.prep.outputs.container_name }})
+          CONTAINER_STATUS=$(docker container inspect --format "{{.State.Status}}" ${{ env.CONTAINER_NAME }})
           if [[ ${CONTAINER_STATUS} != "running" ]]; then
-            >&2 echo "❌ Container ${{ steps.prep.outputs.container_name }} returned status '$CONTAINER_STATUS'"
+            >&2 echo "❌ Container ${{ env.CONTAINER_NAME }} returned status '$CONTAINER_STATUS'"
             exit 1
           fi
 
-          docker stop ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
+          docker stop ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
       -
-        name: Build Alpine s6 dist
-        uses: docker/build-push-action@v2
+        name: Build dist
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           load: true
           pull: true
-          tags: ${{ steps.prep.outputs.base_image }}-dist
+          tags: ${{ env.BASE_IMAGE }}-dist
           build-args: |
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Check dist content
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ./test
           file: ./test/dist.Dockerfile
           build-args: |
-            DIST_IMAGE=${{ steps.prep.outputs.base_image }}-dist
+            DIST_IMAGE=${{ env.BASE_IMAGE }}-dist
       -
         name: Container logs
         if: always()
         run: |
-          docker logs ${{ steps.prep.outputs.container_name }}
-          docker rm -f ${{ steps.prep.outputs.container_name }} > /dev/null 2>&1 || true
+          docker logs ${{ env.CONTAINER_NAME }}
+          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true

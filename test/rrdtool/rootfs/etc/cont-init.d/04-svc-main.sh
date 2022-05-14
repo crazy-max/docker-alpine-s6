@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 
 LOG_LEVEL=${LOG_LEVEL:-LOG_INFO}
 WRITE_TIMEOUT=${WRITE_TIMEOUT:-300}
