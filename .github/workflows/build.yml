@@ -141,7 +141,7 @@ jobs:
       -
         name: Upload artifacts
         if: matrix.alpine_version == env.ALPINE_LATEST
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: s6-overlay
           path: ./dist/*
