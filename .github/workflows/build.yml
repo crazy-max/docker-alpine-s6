@@ -112,9 +112,6 @@ jobs:
         with:
           targets: artifact-all
           pull: true
-          set: |
-            *.cache-from=type=gha,scope=22-${{ matrix.alpine_version }}-artifacts
-            *.cache-to=type=gha,scope=22-${{ matrix.alpine_version }}-artifacts,mode=max
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
