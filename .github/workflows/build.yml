@@ -32,12 +32,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - alpine_version: 3.12
-          - alpine_version: 3.13
-          - alpine_version: 3.14
-          - alpine_version: 3.15
-          - alpine_version: edge
+        alpine_version:
+          - 3.12
+          - 3.13
+          - 3.14
+          - 3.15
+          - edge
     runs-on: ubuntu-latest
     steps:
       -
