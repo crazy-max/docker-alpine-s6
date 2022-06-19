@@ -7,7 +7,7 @@ ARG PUREFTPD_VERSION
 RUN apk --update --no-cache add curl patch tar
 WORKDIR /dist/pureftpd
 COPY patchs /dist
-RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
+RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/obsolete/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
   && patch -p1 < ../minimal.patch
 
 RUN apk --update --no-cache add \
