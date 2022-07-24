@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0.3-r18 (2022/07/24)
+
+* Upstream Alpine update
+
+## 2.2.0.3-r17 (2022/05/26)
+
+* Alpine Linux 3.16 (#50)
+
 ## 2.2.0.3-r16 (2022/05/15)
 
 * Upstream Alpine update
