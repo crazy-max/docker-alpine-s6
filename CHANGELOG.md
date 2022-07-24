@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.1.2-r1 (2022/07/24)
+
+* Upstream Alpine update
+
+## 2.2.0.3-r18 (2022/07/24)
+
+* Upstream Alpine update
+
 ## 3.1.1.2-r0 (2022/07/11)
 
 * s6-overlay 3.1.1.2 (#53)
