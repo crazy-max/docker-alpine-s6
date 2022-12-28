@@ -25,7 +25,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/alpine-s6
   DOCKERHUB_DIST_SLUG: crazymax/alpine-s6-dist
   GHCR_DIST_SLUG: ghcr.io/crazy-max/alpine-s6-dist
-  ALPINE_LATEST: 3.16
+  ALPINE_LATEST: 3.17
 
 jobs:
   build:
@@ -38,6 +38,7 @@ jobs:
           - 3.14
           - 3.15
           - 3.16
+          - 3.17
           - edge
     runs-on: ubuntu-latest
     steps:
