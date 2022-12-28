@@ -26,7 +26,7 @@ FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS alpine
 
 FROM alpine AS src
-RUN apk --update --no-cache add curl git tar
+RUN apk --update --no-cache add curl git patch tar
 WORKDIR /src
 
 FROM src AS src-s6overlay
@@ -48,6 +48,8 @@ EOT
 FROM src AS src-skalibs
 ARG SKALIBS_VERSION
 RUN curl -sSL "https://skarnet.org/software/skalibs/skalibs-${SKALIBS_VERSION}.tar.gz" | tar xz --strip 1
+COPY patches/skalibs /src/patches
+RUN for i in /src/patches/*.patch; do patch -p1 < $i; done
 
 FROM src AS src-execline
 ARG EXECLINE_VERSION
