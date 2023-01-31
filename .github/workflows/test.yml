@@ -52,7 +52,7 @@ jobs:
           driver: docker
       -
         name: Build image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
@@ -63,7 +63,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Build ${{ matrix.target }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./test/${{ matrix.target }}
           build-args: |
@@ -100,7 +100,7 @@ jobs:
           docker stop ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
       -
         name: Build dist
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
@@ -111,7 +111,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Check dist content
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./test
           file: ./test/dist.Dockerfile
