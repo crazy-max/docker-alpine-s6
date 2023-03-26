@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.1.2-r3 (2023/03/27)
+
+* Upstream Alpine update
+
+## 2.2.0.3-r20 (2023/03/27)
+
+* Upstream Alpine update
+
 ## 3.1.1.2-r2 (2022/12/28)
 
 * Alpine Linux 3.17 (#54)
