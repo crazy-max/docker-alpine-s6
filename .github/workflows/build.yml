@@ -133,6 +133,7 @@ jobs:
         with:
           targets: artifact-all
           pull: true
+          provenance: false
         env:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
