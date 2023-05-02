@@ -33,16 +33,18 @@ FROM src AS src-s6overlay
 ARG S6_OVERLAY_VERSION
 ARG S6_OVERLAY_REF
 RUN <<EOT
-git clone https://github.com/just-containers/s6-overlay.git .
-git reset --hard $S6_OVERLAY_REF
+  set -e
+  git clone https://github.com/just-containers/s6-overlay.git .
+  git reset --hard $S6_OVERLAY_REF
 EOT
 
 FROM src AS src-bearssl
 ARG BEARSSL_VERSION
 ARG BEARSSL_REF
 RUN <<EOT
-git clone https://www.bearssl.org/git/BearSSL .
-git reset --hard $BEARSSL_REF
+  set -e
+  git clone https://www.bearssl.org/git/BearSSL .
+  git reset --hard $BEARSSL_REF
 EOT
 
 FROM src AS src-skalibs
@@ -86,8 +88,9 @@ RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NET
 FROM src AS src-s6overlayhelpers
 ARG S6_OVERLAY_HELPERS_VERSION
 RUN <<EOT
-git clone https://github.com/just-containers/s6-overlay-helpers.git .
-git reset --hard v$S6_OVERLAY_HELPERS_VERSION
+  set -e
+  git clone https://github.com/just-containers/s6-overlay-helpers.git .
+  git reset --hard v$S6_OVERLAY_HELPERS_VERSION
 EOT
 
 FROM alpine AS base
@@ -102,136 +105,136 @@ ENV XX_CC_PREFER_LINKER=ld
 WORKDIR /usr/local/src/skalibs
 COPY --from=src-skalibs /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --with-default-path=/command:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --with-sysdep-devurandom=yes
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --with-default-path=/command:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --with-sysdep-devurandom=yes
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/execline
 COPY --from=src-execline /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --disable-pedantic-posix
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --disable-pedantic-posix
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6
 COPY --from=src-s6 /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6rc
 COPY --from=src-s6rc /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6linuxinit
 COPY --from=src-s6linuxinit /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6portableutils
 COPY --from=src-s6portableutils /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6linuxutils
 COPY --from=src-s6linuxutils /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6dns
 COPY --from=src-s6dns /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 # https://bearssl.org/gitweb/?p=BearSSL;a=blob;f=conf/Unix.mk;h=02f2b2be8ee48d1645b478fc02e53acede3c5102;hb=refs/heads/master
 WORKDIR /usr/local/src/bearssl
 COPY --from=src-bearssl /src .
 RUN <<EOT
-set -ex
-mkdir -p /out/include
-cp -a ./inc/*.h /out/include/
-make lib CC=xx-clang AR=$(xx-info)-ar LDDLL=xx-clang LD=xx-clang
-mkdir -p /out/lib
-cp -f build/libbearssl.a /out/lib/
+  set -ex
+  mkdir -p /out/include
+  cp -a ./inc/*.h /out/include/
+  make lib CC=xx-clang AR=$(xx-info)-ar LDDLL=xx-clang LD=xx-clang
+  mkdir -p /out/lib
+  cp -f build/libbearssl.a /out/lib/
 EOT
 
 WORKDIR /usr/local/src/s6networking
 COPY --from=src-s6networking /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --enable-ssl=bearssl --with-ssl-path=/out
-make -j$(nproc)
-make DESTDIR=/out -L install update global-links -j$(nproc)
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --enable-ssl=bearssl --with-ssl-path=/out
+  make -j$(nproc)
+  make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
 
 WORKDIR /usr/local/src/s6overlayhelpers
 COPY --from=src-s6overlayhelpers /src .
 RUN <<EOT
-set -ex
-DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
-make
-make DESTDIR=/out -L install update global-links
+  set -ex
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared
+  make
+  make DESTDIR=/out -L install update global-links
 EOT
 
 WORKDIR /usr/local/src/s6overlay
 ARG S6_OVERLAY_VERSION
 COPY --from=src-s6overlay /src .
 RUN <<EOT
-set -ex
+  set -ex
 
-# cleanup
-rm -rf /out/package/*/*/include /out/package/*/*/library
+  # cleanup
+  rm -rf /out/package/*/*/include /out/package/*/*/library
 
-# s6-overlay
-find ./layout/rootfs-overlay -type f -name .empty -print | xargs rm -f --
-find ./layout/rootfs-overlay -name '*@VERSION@*' -print | while read name; do
-  mv -f "$name" $(echo "$name" | sed -e "s/@VERSION@/$S6_OVERLAY_VERSION/")
-done
-find ./layout/rootfs-overlay -type f -size +0c -print | xargs sed -i -e "s|@SHEBANGDIR@|/command|g; s/@VERSION@/$S6_OVERLAY_VERSION/g;" --
-(cd /out/package/admin/ ; ln -s s6-overlay-$S6_OVERLAY_VERSION s6-overlay)
-cp -rf ./layout/rootfs-overlay/* /out/
+  # s6-overlay
+  find ./layout/rootfs-overlay -type f -name .empty -print | xargs rm -f --
+  find ./layout/rootfs-overlay -name '*@VERSION@*' -print | while read name; do
+    mv -f "$name" $(echo "$name" | sed -e "s/@VERSION@/$S6_OVERLAY_VERSION/")
+  done
+  find ./layout/rootfs-overlay -type f -size +0c -print | xargs sed -i -e "s|@SHEBANGDIR@|/command|g; s/@VERSION@/$S6_OVERLAY_VERSION/g;" --
+  (cd /out/package/admin/ ; ln -s s6-overlay-$S6_OVERLAY_VERSION s6-overlay)
+  cp -rf ./layout/rootfs-overlay/* /out/
 
-# s6-syslogd-overlay
-find ./layout/syslogd-overlay -type f -name .empty -print | xargs rm -f --
-find ./layout/syslogd-overlay -name '*@VERSION@*' -print | while read name; do
-  mv -f "$name" $(echo "$name" | sed -e "s/@VERSION@/$S6_OVERLAY_VERSION/")
-done
-find ./layout/syslogd-overlay -type f -size +0c -print | xargs sed -i -e "s|@SHEBANGDIR@|/command|g; s/@VERSION@/$S6_OVERLAY_VERSION/g;" --
-cp -rf ./layout/syslogd-overlay/* /out/
+  # s6-syslogd-overlay
+  find ./layout/syslogd-overlay -type f -name .empty -print | xargs rm -f --
+  find ./layout/syslogd-overlay -name '*@VERSION@*' -print | while read name; do
+    mv -f "$name" $(echo "$name" | sed -e "s/@VERSION@/$S6_OVERLAY_VERSION/")
+  done
+  find ./layout/syslogd-overlay -type f -size +0c -print | xargs sed -i -e "s|@SHEBANGDIR@|/command|g; s/@VERSION@/$S6_OVERLAY_VERSION/g;" --
+  cp -rf ./layout/syslogd-overlay/* /out/
 
-# symlinks
-mkdir -p /out/usr/bin
-for i in $(ls -1 /out/command); do
-  ln -s "../../command/$i" /out/usr/bin/
-done
+  # symlinks
+  mkdir -p /out/usr/bin
+  for i in $(ls -1 /out/command); do
+    ln -s "../../command/$i" /out/usr/bin/
+  done
 EOT
 
 FROM base AS tgz
