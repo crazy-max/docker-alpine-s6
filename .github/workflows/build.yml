@@ -47,7 +47,6 @@ jobs:
         uses: actions/checkout@v3
       -
         name: Prepare
-        id: prep
         run: |
           NL=$'\n'
           ALPINE_VERSION=${{ matrix.alpine_version }}
@@ -75,7 +74,9 @@ jobs:
               IMAGE_TAGS="${IMAGE_TAGS}latest${NL}"
             fi
           fi
-          echo "::set-output name=tags::${IMAGE_TAGS}"
+          echo "IMAGE_TAGS<<EOF" >> $GITHUB_ENV
+          echo -e "$IMAGE_TAGS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
       -
         name: Docker meta
         id: meta
@@ -84,7 +85,7 @@ jobs:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
             ${{ env.GHCR_SLUG }}
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ${{ env.IMAGE_TAGS }}
           labels: |
             org.opencontainers.image.title=alpine-s6
             org.opencontainers.image.description=Alpine Linux with s6 overlay
@@ -97,7 +98,7 @@ jobs:
           images: |
             ${{ env.DOCKERHUB_DIST_SLUG }}
             ${{ env.GHCR_DIST_SLUG }}
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ${{ env.IMAGE_TAGS }}
           labels: |
             org.opencontainers.image.title=alpine-s6-dist
             org.opencontainers.image.description=s6 overlay
