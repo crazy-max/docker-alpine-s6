@@ -1,1 +1,1 @@
-listening for connections
+service legacy-services successfully started
