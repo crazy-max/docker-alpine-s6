@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r21 (2023/06/07)
+
+* Alpine Linux 3.18 (#67)
+
 ## 2.2.0.3-r20 (2023/03/27)
 
 * Upstream Alpine update
