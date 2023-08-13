@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.4.2-r2 (2023/08/13)
+
+* Upstream Alpine update
+
+## 2.2.0.3-r22 (2023/08/13)
+
+* Upstream Alpine update
+
 ## 3.1.4.2-r1 (2023/06/07)
 
 * Alpine Linux 3.18 (#65)
