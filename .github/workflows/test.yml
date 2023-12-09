@@ -51,7 +51,7 @@ jobs:
           driver: docker
       -
         name: Build image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
@@ -62,7 +62,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Build ${{ matrix.target }}
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./test/${{ matrix.target }}
           build-args: |
@@ -83,7 +83,7 @@ jobs:
           timeout: 120
       -
         name: Build dist
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
@@ -94,7 +94,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Check dist content
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./test
           file: ./test/dist.Dockerfile
