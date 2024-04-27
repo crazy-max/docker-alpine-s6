@@ -175,7 +175,7 @@ jobs:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
         name: GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: matrix.alpine_version == env.ALPINE_LATEST && startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
