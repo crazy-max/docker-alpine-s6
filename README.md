@@ -36,7 +36,7 @@ This repository provides two images. The first one is built on top of alpine
 so, you can use it as a base image for your own images:
 
 ```dockerfile
-FROM crazymax/alpine-s6:3.19
+FROM crazymax/alpine-s6:3.20
 RUN apk add --no-cache nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
@@ -77,6 +77,7 @@ Image: crazymax/alpine-s6:latest
    - linux/arm64
    - linux/386
    - linux/ppc64le
+   - linux/riscv64
    - linux/s390x
 ```
 
@@ -98,6 +99,7 @@ Image: crazymax/alpine-s6-dist:latest
    - linux/arm64
    - linux/386
    - linux/ppc64le
+   - linux/riscv64
    - linux/s390x
 ```
 
