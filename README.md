@@ -52,7 +52,7 @@ needed to run s6-overlay. This way you can use any base image and use the
 
 ```dockerfile
 FROM ubuntu
-COPY --from=crazymax/alpine-s6-dist:3.19 / /
+COPY --from=crazymax/alpine-s6-dist:3.20 / /
 RUN apt-get update && apt-get install -y nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
@@ -104,8 +104,10 @@ Image: crazymax/alpine-s6-dist:latest
 ## Supported tags
 
 * `edge`, `edge-x.x.x.x`
-* `latest-edge`, `3.19-edge`
-* `latest`, `latest-x.x.x.x`, `3.19`, `3.19-x.x.x.x`
+* `latest-edge`, `3.20-edge`
+* `latest`, `latest-x.x.x.x`, `3.20`, `3.20-x.x.x.x`
+* `3.19-edge`
+* `3.19`, `3.19-x.x.x.x`
 * `3.18-edge`
 * `3.18`, `3.18-x.x.x.x`
 * `3.17-edge`
@@ -114,8 +116,6 @@ Image: crazymax/alpine-s6-dist:latest
 * `3.16`, `3.16-x.x.x.x`
 * `3.15-edge`
 * `3.15`, `3.15-x.x.x.x`
-* `3.14-edge`
-* `3.14`, `3.14-x.x.x.x`
 
 > `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `3.1.0.1`).
 
