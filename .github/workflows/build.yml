@@ -25,7 +25,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/alpine-s6
   DOCKERHUB_DIST_SLUG: crazymax/alpine-s6-dist
   GHCR_DIST_SLUG: ghcr.io/crazy-max/alpine-s6-dist
-  ALPINE_LATEST: 3.20
+  ALPINE_LATEST: '3.20'
 
 jobs:
   build:
