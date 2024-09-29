@@ -102,7 +102,7 @@ RUN apk --update --no-cache add \
 
 WORKDIR /tmp/skalibs
 COPY --from=dl-skalibs /dl .
-COPY patchs/skalibs .
+COPY patches/skalibs .
 RUN sed -i "s|@@VERSION@@|${SKALIBS_VERSION}|" -i *.pc \
   && ./configure \
     --enable-shared \
@@ -128,7 +128,7 @@ RUN ./configure \
 
 WORKDIR /tmp/s6
 COPY --from=dl-s6 /dl .
-COPY patchs/s6 .
+COPY patches/s6 .
 RUN ./configure \
     --enable-shared \
     --enable-static \
