@@ -38,7 +38,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Prepare
         run: |
@@ -46,12 +46,12 @@ jobs:
           echo "LOG_CHECK=$(cat ./test/${{ matrix.target }}/logcheck.txt)" >> $GITHUB_ENV
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver: docker
       -
         name: Build image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -62,7 +62,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Build ${{ matrix.target }}
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: ./test/${{ matrix.target }}
           build-args: |
@@ -83,7 +83,7 @@ jobs:
           timeout: 120
       -
         name: Build dist
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -94,7 +94,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Check dist content
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: ./test
           file: ./test/dist.Dockerfile
