@@ -42,8 +42,9 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
 ```
 
-> Note: `ENTRYPOINT ["/init"]` is already defined in the base image so no need
-> to add this command.
+> [!NOTE]
+> `ENTRYPOINT ["/init"]` is already defined in the base image so no need to add
+> this command.
 
 The second one is a [distribution image](#dist-image). This is a
 multi-platform scratch image that only contains all the scripts and binaries

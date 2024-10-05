@@ -3,24 +3,24 @@
 ARG ALPINE_VERSION="latest"
 ARG XX_VERSION="1.5.0"
 
-ARG S6_OVERLAY_VERSION="3.1.5.0"
-ARG S6_OVERLAY_REF="9eda003e19a6e01edd951ad84dd50a4804129d73"
+ARG S6_OVERLAY_VERSION="3.2.0.0"
+ARG S6_OVERLAY_REF="e2738d136bbdedbe3553b947f3c18183fc70e56c"
 
-# https://bearssl.org/gitweb/?p=BearSSL;a=commit;h=46f7dddce75227f2e40ab94d66ceb9f19ee6b1b0
+# https://bearssl.org/gitweb/?p=BearSSL;a=commit;h=79c060eea3eea1257797f15ea1608a9a9923aa6f
 ARG BEARSSL_VERSION="0.6"
-ARG BEARSSL_REF="46f7dddce75227f2e40ab94d66ceb9f19ee6b1b0"
+ARG BEARSSL_REF="79c060eea3eea1257797f15ea1608a9a9923aa6f"
 
-ARG SKALIBS_VERSION="2.13.1.1"
-ARG EXECLINE_VERSION="2.9.3.0"
+ARG SKALIBS_VERSION="2.14.2.0"
+ARG EXECLINE_VERSION="2.9.6.0"
 
-ARG S6_VERSION="2.11.3.2"
-ARG S6_RC_VERSION="0.5.4.1"
-ARG S6_LINUX_INIT_VERSION="1.1.1.1"
-ARG S6_PORTABLE_UTILS_VERSION="2.3.0.2"
-ARG S6_LINUX_UTILS_VERSION="2.6.1.2"
-ARG S6_DNS_VERSION="2.3.5.5"
-ARG S6_NETWORKING_VERSION="2.5.1.3"
-ARG S6_OVERLAY_HELPERS_VERSION="0.1.0.1"
+ARG S6_VERSION="2.13.0.0"
+ARG S6_RC_VERSION="0.5.4.3"
+ARG S6_LINUX_INIT_VERSION="1.1.2.0"
+ARG S6_PORTABLE_UTILS_VERSION="2.3.0.3"
+ARG S6_LINUX_UTILS_VERSION="2.6.2.0"
+ARG S6_DNS_VERSION="2.3.7.2"
+ARG S6_NETWORKING_VERSION="2.7.0.3"
+ARG S6_OVERLAY_HELPERS_VERSION="0.1.1.0"
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS alpine
@@ -104,7 +104,7 @@ WORKDIR /usr/local/src/skalibs
 COPY --from=src-skalibs /src .
 RUN <<EOT
   set -ex
-  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --with-default-path=/command:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --with-sysdep-devurandom=yes
+  DESTDIR=/out ./configure --host=$(xx-clang --print-target-triple) --enable-slashpackage --enable-static-libc --disable-shared --with-default-path=/command:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --with-sysdep-devurandom=yes --with-sysdep-grndinsecure=no --with-sysdep-posixspawnearlyreturn=no
   make -j$(nproc)
   make DESTDIR=/out -L install update global-links -j$(nproc)
 EOT
