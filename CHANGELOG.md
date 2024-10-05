@@ -1,8 +1,9 @@
 # Changelog
 
-## 2.2.0.3-r25 (2024/09/29)
+## 2.2.0.3-r25 (2024/10/05)
 
 * Upstream Alpine update
+* Workaround for gcc 14 incompatible pointer types (#91)
 
 ## 2.2.0.3-r24 (2024/05/26)
 
