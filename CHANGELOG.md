@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.2.0.0-r0 (2024/10/05)
+
+* s6-overlay 3.2.0.0 (#92)
+
+## 2.2.0.3-r25 (2024/10/05)
+
+* Upstream Alpine update
+* Workaround for gcc 14 incompatible pointer types (#91)
+
 ## 3.1.5.0-r2 (2024/05/26)
 
 * Alpine Linux 3.20 (#81)
