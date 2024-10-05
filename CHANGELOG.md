@@ -1,13 +1,5 @@
 # Changelog
 
-## 3.1.5.0-r3 (2024/09/29)
-
-* Upstream Alpine update
-
-## 2.2.0.3-r25 (2024/09/29)
-
-* Upstream Alpine update
-
 ## 3.1.5.0-r2 (2024/05/26)
 
 * Alpine Linux 3.20 (#81)
