@@ -1,0 +1,48 @@
+From 452a56a21670fd005208282f0479a1c4537325e3 Mon Sep 17 00:00:00 2001
+From: Laurent Bercot <ska-skaware@skarnet.org>
+Date: Tue, 2 Apr 2024 16:42:48 +0000
+Subject: [PATCH]  Workaround for gcc 14 (and others!)
+ incompatible-pointer-types stupidity
+
+Signed-off-by: Laurent Bercot <ska@appnovation.com>
+---
+ src/headers/signed-template   | 6 +++---
+ src/headers/unsigned-template | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/headers/signed-template b/src/headers/signed-template
+index a3b85eb..10f89c1 100644
+--- a/src/headers/signed-template
++++ b/src/headers/signed-template
+@@ -7,8 +7,8 @@
+ #define @TYPE@_FMT (1+UINT@BITS@_FMT)
+ #define @type@_fmt int@BITS@_fmt
+ #define @type@_fmtlist int@BITS@_fmtlist
+-#define @type@_scan int@BITS@_scan
+-#define @type@0_scan int@BITS@0_scan
+-#define @type@_scanlist int@BITS@_scanlist
++#define @type@_scan(s, d, b) int@BITS@_scan(s, (int@BITS@_t *)d, b)
++#define @type@0_scan(s, d, b) int@BITS@0_scan(s, (int@BITS@_t *)d, b)
++#define @type@_scanlist(tab, max, s, num) int@BITS@_scanlist((int@BITS@_t *)tab, max, s, num)
+
+
+diff --git a/src/headers/unsigned-template b/src/headers/unsigned-template
+index d7496a0..0aad7da 100644
+--- a/src/headers/unsigned-template
++++ b/src/headers/unsigned-template
+@@ -29,9 +29,9 @@
+
+ #define @type@_fmtlist uint@BITS@_fmtlist
+
+-#define @type@_scan_base uint@BITS@_scan_base
+-#define @type@0_scan_base uint@BITS@0_scan_base
+-#define @type@_scanlist uint@BITS@_scanlist
++#define @type@_scan_base(s, u, b) uint@BITS@_scan_base(s, (uint@BITS@_t *)u, b)
++#define @type@0_scan_base(s, u, b) uint@BITS@0_scan_base(s, (uint@BITS@_t *)u, b)
++#define @type@_scanlist(tab, max, s, num) uint@BITS@_scanlist((uint@BITS@_t *)tab, max, s, num)
+
+ #define @type@_scan(s, u) @type@_scan_base(s, (u), 10)
+ #define @type@0_scan(s, u) @type@0_scan_base(s, (u), 10)
+--
+2.26.2
+
