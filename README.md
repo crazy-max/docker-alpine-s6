@@ -68,18 +68,17 @@ ENTRYPOINT ["/init"]
 | [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6) | `ghcr.io/crazy-max/alpine-s6` |
 
 ```
-$ docker run --rm mplatform/mquery crazymax/alpine-s6:latest
-Image: crazymax/alpine-s6:latest
- * Manifest List: Yes
- * Supported platforms:
-   - linux/amd64
-   - linux/arm/v6
-   - linux/arm/v7
-   - linux/arm64
-   - linux/386
-   - linux/ppc64le
-   - linux/riscv64
-   - linux/s390x
+$ docker buildx imagetools inspect crazymax/alpine-s6 --format "{{json .Manifest}}" | \
+  jq -r '.manifests[] | select(.platform.os != null and .platform.os != "unknown") | .platform | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"'
+
+linux/386
+linux/amd64
+linux/arm/v6
+linux/arm/v7
+linux/arm64
+linux/ppc64le
+linux/riscv64
+linux/s390x
 ```
 
 ## Dist image
@@ -90,18 +89,17 @@ Image: crazymax/alpine-s6:latest
 | [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/alpine-s6-dist) | `ghcr.io/crazy-max/alpine-s6-dist` |
 
 ```
-$ docker run --rm mplatform/mquery crazymax/alpine-s6-dist:latest
-Image: crazymax/alpine-s6-dist:latest
- * Manifest List: Yes
- * Supported platforms:
-   - linux/amd64
-   - linux/arm/v6
-   - linux/arm/v7
-   - linux/arm64
-   - linux/386
-   - linux/ppc64le
-   - linux/riscv64
-   - linux/s390x
+$ docker buildx imagetools inspect crazymax/alpine-s6-dist --format "{{json .Manifest}}" | \
+  jq -r '.manifests[] | select(.platform.os != null and .platform.os != "unknown") | .platform | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"'
+
+linux/386
+linux/amd64
+linux/arm/v6
+linux/arm/v7
+linux/arm64
+linux/ppc64le
+linux/riscv64
+linux/s390x
 ```
 
 ## Supported tags
