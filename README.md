@@ -36,7 +36,7 @@ This repository provides two images. The first one is built on top of alpine
 so, you can use it as a base image for your own images:
 
 ```dockerfile
-FROM crazymax/alpine-s6:3.20
+FROM crazymax/alpine-s6
 RUN apk add --no-cache nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
@@ -53,7 +53,7 @@ needed to run s6-overlay. This way you can use any base image and use the
 
 ```dockerfile
 FROM ubuntu
-COPY --from=crazymax/alpine-s6-dist:3.20 / /
+COPY --from=crazymax/alpine-s6-dist / /
 RUN apt-get update && apt-get install -y nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
@@ -105,8 +105,10 @@ linux/s390x
 ## Supported tags
 
 * `edge`, `edge-x.x.x.x`
-* `latest-edge`, `3.20-edge`
-* `latest`, `latest-x.x.x.x`, `3.20`, `3.20-x.x.x.x`
+* `latest-edge`, `3.21-edge`
+* `latest`, `latest-x.x.x.x`, `3.21`, `3.21-x.x.x.x`
+* `3.20-edge`
+* `3.20`, `3.20-x.x.x.x`
 * `3.19-edge`
 * `3.19`, `3.19-x.x.x.x`
 * `3.18-edge`
@@ -115,8 +117,6 @@ linux/s390x
 * `3.17`, `3.17-x.x.x.x`
 * `3.16-edge`
 * `3.16`, `3.16-x.x.x.x`
-* `3.15-edge`
-* `3.15`, `3.15-x.x.x.x`
 
 > `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `3.1.0.1`).
 
