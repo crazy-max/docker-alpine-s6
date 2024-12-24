@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0.3-r26 (2024/12/24)
+
+* Alpine Linux 3.21 (#95)
+
 ## 2.2.0.3-r25 (2024/10/05)
 
 * Upstream Alpine update
