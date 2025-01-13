@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.0.2-r1 (2025/01/13)
+
+* Upstream Alpine update 
+
+## 2.2.0.3-r27 (2025/01/13)
+
+* Upstream Alpine update
+
 ## 3.2.0.2-r0 (2024/12/24)
 
 * s6-overlay 3.2.0.2 (#96)
