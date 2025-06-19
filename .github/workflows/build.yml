@@ -1,8 +1,12 @@
 name: build
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  contents: read
 
 on:
   push:
@@ -29,6 +33,12 @@ env:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
+    permissions:
+      # required to create GitHub release
+      contents: write
+      # required to push to GHCR
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +50,6 @@ jobs:
           - '3.20'
           - '3.21'
           - 'edge'
-    runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
