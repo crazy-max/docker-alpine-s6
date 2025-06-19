@@ -1,5 +1,13 @@
 name: test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -27,12 +35,12 @@ jobs:
           - pureftpd
           - rrdtool
         alpine_version:
-          - '3.16'
           - '3.17'
           - '3.18'
           - '3.19'
           - '3.20'
           - '3.21'
+          - '3.22'
           - 'edge'
     runs-on: ubuntu-latest
     steps:
