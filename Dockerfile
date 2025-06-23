@@ -85,11 +85,7 @@ RUN curl -sSL "https://skarnet.org/software/s6-networking/s6-networking-${S6_NET
 
 FROM src AS src-s6overlayhelpers
 ARG S6_OVERLAY_HELPERS_VERSION
-RUN <<EOT
-  set -e
-  git clone https://github.com/just-containers/s6-overlay-helpers.git .
-  git reset --hard v$S6_OVERLAY_HELPERS_VERSION
-EOT
+ADD "https://github.com/just-containers/s6-overlay-helpers.git#v${S6_OVERLAY_HELPERS_VERSION}" .
 
 FROM alpine AS base
 RUN apk --update --no-cache add bash clang curl git llvm make tar tree xz
@@ -233,6 +229,8 @@ RUN <<EOT
   for i in $(ls -1 /out/command); do
     ln -s "../../command/$i" /out/usr/bin/
   done
+
+  tree /out
 EOT
 
 FROM base AS tgz

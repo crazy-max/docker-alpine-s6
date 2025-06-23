@@ -1,1 +1,0 @@
-service legacy-services successfully started

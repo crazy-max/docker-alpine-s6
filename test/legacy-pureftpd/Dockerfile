@@ -1,7 +1,8 @@
+# syntax=docker/dockerfile:1
 ARG BASE_IMAGE
 ARG PUREFTPD_VERSION=1.0.47
 
-FROM ${BASE_IMAGE:-test-alpine-s6} AS builder
+FROM ${BASE_IMAGE:-alpine-s6:local} AS builder
 ARG PUREFTPD_VERSION
 
 RUN apk --update --no-cache add curl patch tar
@@ -46,7 +47,7 @@ RUN ./configure \
   && make install-strip \
   && tree /pure-ftpd
 
-FROM ${BASE_IMAGE:-test-alpine-s6}
+FROM ${BASE_IMAGE:-alpine-s6:local}
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
   SOCKLOG_TIMESTAMP_FORMAT="" \

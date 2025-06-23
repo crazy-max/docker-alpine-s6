@@ -23,17 +23,26 @@ on:
       - '**.md'
 
 env:
-  BUILD_TAG: test
-  BASE_IMAGE: test-alpine-s6
+  BUILD_TAG: alpinetest
 
 jobs:
   test:
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     strategy:
       fail-fast: false
       matrix:
-        target:
+        test-case:
           - legacy-pureftpd
           - legacy-rrdtool
+          - nginx
+          - nginx-dist
+          - nginx-legacy
+          - nginx-legacy-dist
         alpine_version:
           - '3.17'
           - '3.18'
@@ -42,75 +51,70 @@ jobs:
           - '3.21'
           - '3.22'
           - 'edge'
-    runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
       -
         name: Prepare
-        run: |
-          echo "CONTAINER_NAME=${{ matrix.target }}" >> $GITHUB_ENV
-          echo "LOG_CHECK=$(cat ./test/${{ matrix.target }}/logcheck.txt)" >> $GITHUB_ENV
+        id: prepare
+        uses: actions/github-script@v7
+        env:
+          INPUT_TEST-CASE: ${{ matrix.test-case }}
+        with:
+          script: |
+            const fs = require('fs');
+
+            const testCase = core.getInput('test-case');
+            const testconfigPath = `./test/${testCase}/testconfig.json`;
+            if (!fs.existsSync(testconfigPath)) {
+              throw new Error(`Test configuration file not found: ${testconfigPath}`);
+            }
+
+            const testconfig = JSON.parse(fs.readFileSync(testconfigPath, 'utf8'));
+            if (testconfig.logcheck === undefined || testconfig.logcheck.length === 0) {
+              throw new Error(`Test configuration file is missing the "logcheck" property or is empty`);
+            }
+
+            core.setOutput('logCheck', testconfig.logcheck);
+            core.setOutput('target', testconfig.dist ? 'image-dist' : 'image');
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          driver: docker
+          driver-opts: network=host
       -
-        name: Build image
+        name: Build ${{ steps.prepare.outputs.target }}
+        uses: docker/bake-action@v6
+        with:
+          source: .
+          targets: ${{ steps.prepare.outputs.target }}
+          push: true
+          set: |
+            *.args.ALPINE_VERSION=${{ matrix.alpine_version }}
+            *.tags=localhost:5000/alpine-s6
+      -
+        name: Build ${{ matrix.test-case }}
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
-          load: true
-          pull: true
-          tags: ${{ env.BASE_IMAGE }}
+          context: ./test/${{ matrix.test-case }}
           build-args: |
-            ALPINE_VERSION=${{ matrix.alpine_version }}
-      -
-        name: Build ${{ matrix.target }}
-        uses: docker/build-push-action@v6
-        with:
-          context: ./test/${{ matrix.target }}
-          build-args: |
-            BASE_IMAGE=${{ env.BASE_IMAGE }}
+            BASE_IMAGE=localhost:5000/alpine-s6
           load: true
           tags: ${{ env.BUILD_TAG }}
       -
-        name: Start ${{ matrix.target }}
+        name: Start ${{ matrix.test-case }}
         run: |
-          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
-          docker run -d --name ${{ env.CONTAINER_NAME }} ${{ env.BUILD_TAG }}
+          docker run -d --name ${{ matrix.test-case }} ${{ env.BUILD_TAG }}
       -
         name: Check container logs
         uses: crazy-max/.github/.github/actions/container-logs-check@main
         with:
-          container_name: ${{ env.CONTAINER_NAME }}
-          log_check: ${{ env.LOG_CHECK }}
+          container_name: ${{ matrix.test-case }}
+          log_check: ${{ steps.prepare.outputs.logCheck }}
           timeout: 120
-      -
-        name: Build dist
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          load: true
-          pull: true
-          tags: ${{ env.BASE_IMAGE }}-dist
-          build-args: |
-            ALPINE_VERSION=${{ matrix.alpine_version }}
-      -
-        name: Check dist content
-        uses: docker/build-push-action@v6
-        with:
-          context: ./test
-          file: ./test/dist.Dockerfile
-          build-args: |
-            DIST_IMAGE=${{ env.BASE_IMAGE }}-dist
       -
         name: Container logs
         if: always()
         run: |
-          docker logs ${{ env.CONTAINER_NAME }}
-          docker rm -f ${{ env.CONTAINER_NAME }} > /dev/null 2>&1 || true
+          docker logs ${{ matrix.test-case }}
