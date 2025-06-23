@@ -1,5 +1,6 @@
+# syntax=docker/dockerfile:1
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE:-test-alpine-s6} AS builder
+FROM ${BASE_IMAGE:-alpine-s6:local} AS builder
 
 ENV TZ="UTC" \
   PUID="1000" \

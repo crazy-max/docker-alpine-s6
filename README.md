@@ -36,6 +36,7 @@ This repository provides two images. The first one is built on top of alpine
 so, you can use it as a base image for your own images:
 
 ```dockerfile
+# syntax=docker/dockerfile:1
 FROM crazymax/alpine-s6
 RUN apk add --no-cache nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
@@ -49,16 +50,24 @@ CMD ["/usr/sbin/nginx"]
 The second one is a [distribution image](#dist-image). This is a
 multi-platform scratch image that only contains all the scripts and binaries
 needed to run s6-overlay. This way you can use any base image and use the
-`COPY --from` command to copy the assets inside your image:
+[`COPY --link --from` command](https://docs.docker.com/reference/dockerfile/#copy---from)
+to copy the assets inside your image:
 
 ```dockerfile
+# syntax=docker/dockerfile:1
 FROM ubuntu
-COPY --from=crazymax/alpine-s6-dist / /
+COPY --link --from=crazymax/alpine-s6-dist / /
 RUN apt-get update && apt-get install -y nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 CMD ["/usr/sbin/nginx"]
 ENTRYPOINT ["/init"]
 ```
+
+> [!WARNING]
+> [`COPY --link`](https://docs.docker.com/reference/dockerfile/#copy---link) is
+> not supported with BuildKit built directly into the Docker Engine. You can
+> use a [Container builder](https://docs.docker.com/build/builders/drivers/docker-container/)
+> in this case.
 
 ## Alpine image
 
