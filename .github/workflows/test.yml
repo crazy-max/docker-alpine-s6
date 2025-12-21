@@ -35,12 +35,12 @@ jobs:
           - pureftpd
           - rrdtool
         alpine_version:
-          - '3.17'
           - '3.18'
           - '3.19'
           - '3.20'
           - '3.21'
           - '3.22'
+          - '3.23'
           - 'edge'
     runs-on: ubuntu-latest
     steps:
