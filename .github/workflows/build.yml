@@ -86,7 +86,7 @@ jobs:
       -
         name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
@@ -99,7 +99,7 @@ jobs:
       -
         name: Docker meta dist
         id: meta_dist
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             ${{ env.DOCKERHUB_DIST_SLUG }}
