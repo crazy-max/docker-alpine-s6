@@ -95,7 +95,7 @@ jobs:
             *.tags=localhost:5000/alpine-s6
       -
         name: Build ${{ matrix.test-case }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./test/${{ matrix.test-case }}
           build-args: |
