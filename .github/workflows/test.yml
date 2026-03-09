@@ -85,7 +85,7 @@ jobs:
           driver-opts: network=host
       -
         name: Build ${{ steps.prepare.outputs.target }}
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           targets: ${{ steps.prepare.outputs.target }}
