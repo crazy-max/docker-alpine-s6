@@ -80,7 +80,6 @@ ENTRYPOINT ["/init"]
 $ docker buildx imagetools inspect crazymax/alpine-s6 --format "{{json .Manifest}}" | \
   jq -r '.manifests[] | select(.platform.os != null and .platform.os != "unknown") | .platform | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"'
 
-linux/386
 linux/amd64
 linux/arm/v6
 linux/arm/v7
@@ -101,7 +100,6 @@ linux/s390x
 $ docker buildx imagetools inspect crazymax/alpine-s6-dist --format "{{json .Manifest}}" | \
   jq -r '.manifests[] | select(.platform.os != null and .platform.os != "unknown") | .platform | "\(.os)/\(.architecture)\(if .variant then "/" + .variant else "" end)"'
 
-linux/386
 linux/amd64
 linux/arm/v6
 linux/arm/v7
