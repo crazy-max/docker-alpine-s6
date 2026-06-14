@@ -11,7 +11,6 @@ target "args" {
 
 target "platforms" {
   platforms = ALPINE_VERSION == "3.23" || ALPINE_VERSION == "3.22" || ALPINE_VERSION == "3.21" || ALPINE_VERSION == "3.20" || ALPINE_VERSION == "latest" || ALPINE_VERSION == "edge" ? [
-    "linux/386",
     "linux/amd64",
     "linux/arm64",
     "linux/arm/v6",
@@ -20,7 +19,6 @@ target "platforms" {
     "linux/riscv64",
     "linux/s390x"
   ] : [
-    "linux/386",
     "linux/amd64",
     "linux/arm64",
     "linux/arm/v6",
