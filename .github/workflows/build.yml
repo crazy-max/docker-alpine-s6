@@ -29,7 +29,7 @@ env:
   GHCR_SLUG: ghcr.io/crazy-max/alpine-s6
   DOCKERHUB_DIST_SLUG: crazymax/alpine-s6-dist
   GHCR_DIST_SLUG: ghcr.io/crazy-max/alpine-s6-dist
-  ALPINE_LATEST: '3.23'
+  ALPINE_LATEST: '3.24'
 
 jobs:
   build:
@@ -43,12 +43,12 @@ jobs:
       fail-fast: false
       matrix:
         alpine_version:
-          - '3.18'
           - '3.19'
           - '3.20'
           - '3.21'
           - '3.22'
           - '3.23'
+          - '3.24'
           - 'edge'
     steps:
       -
@@ -67,7 +67,7 @@ jobs:
       -
         name: Docker meta
         id: meta
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: |
             ${{ env.DOCKERHUB_SLUG }}
@@ -80,7 +80,7 @@ jobs:
       -
         name: Docker meta dist
         id: meta_dist
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: |
             ${{ env.DOCKERHUB_DIST_SLUG }}
@@ -92,10 +92,10 @@ jobs:
             org.opencontainers.image.vendor=CrazyMax
       -
         name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
         with:
           buildkitd-config-inline: |
             [worker.oci]
@@ -103,21 +103,21 @@ jobs:
       -
         name: Login to DockerHub
         if: startsWith(github.ref, 'refs/tags/')
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Login to GitHub Container Registry
         if: startsWith(github.ref, 'refs/tags/')
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build artifacts
-        uses: docker/bake-action@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           targets: artifact-all
           pull: true
@@ -139,7 +139,7 @@ jobs:
           if-no-files-found: error
       -
         name: Build image
-        uses: docker/bake-action@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           files: |
             ./docker-bake.hcl
@@ -150,7 +150,7 @@ jobs:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
         name: Build dist
-        uses: docker/bake-action@a66e1c87e2eca0503c343edf1d208c716d54b8a8 # v7.1.0
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
         with:
           files: |
             ./docker-bake.hcl
@@ -162,7 +162,7 @@ jobs:
           ALPINE_VERSION: ${{ matrix.alpine_version }}
       -
         name: GitHub Release
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         if: matrix.alpine_version == env.ALPINE_LATEST && startsWith(github.ref, 'refs/tags/')
         with:
           draft: true

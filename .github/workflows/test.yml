@@ -35,18 +35,18 @@ jobs:
           - pureftpd
           - rrdtool
         alpine_version:
-          - '3.18'
           - '3.19'
           - '3.20'
           - '3.21'
           - '3.22'
           - '3.23'
+          - '3.24'
           - 'edge'
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       -
         name: Prepare
         run: |
@@ -54,12 +54,12 @@ jobs:
           echo "LOG_CHECK=$(cat ./test/${{ matrix.target }}/logcheck.txt)" >> $GITHUB_ENV
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
         with:
           driver: docker
       -
         name: Build image
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ./Dockerfile
@@ -70,7 +70,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Build ${{ matrix.target }}
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: ./test/${{ matrix.target }}
           build-args: |
@@ -84,14 +84,14 @@ jobs:
           docker run -d --name ${{ env.CONTAINER_NAME }} ${{ env.BUILD_TAG }}
       -
         name: Check container logs
-        uses: crazy-max/.github/.github/actions/container-logs-check@9ba6e6f9450baf3b1237f8035c1fdc45932510bd # v1.8.0
+        uses: crazy-max/.github/.github/actions/container-logs-check@46267a6e61cd56aac2fc79943df180152f4c89d6 # v1.10.1
         with:
-          container_name: ${{ env.CONTAINER_NAME }}
+          name: ${{ env.CONTAINER_NAME }}
           log_check: ${{ env.LOG_CHECK }}
           timeout: 120
       -
         name: Build dist
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ./Dockerfile
@@ -102,7 +102,7 @@ jobs:
             ALPINE_VERSION=${{ matrix.alpine_version }}
       -
         name: Check dist content
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: ./test
           file: ./test/dist.Dockerfile
