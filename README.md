@@ -112,18 +112,18 @@ linux/s390x
 ## Supported tags
 
 * `edge`, `edge-x.x.x.x`
-* `latest-edge`, `3.22-edge`
-* `latest`, `latest-x.x.x.x`, `3.22`, `3.22-x.x.x.x`
+* `latest-edge`, `3.24-edge`
+* `latest`, `latest-x.x.x.x`, `3.24`, `3.24-x.x.x.x`
+* `3.23-edge`
+* `3.23`, `3.23-x.x.x.x`
+* `3.22-edge`
+* `3.22`, `3.22-x.x.x.x`
 * `3.21-edge`
 * `3.21`, `3.21-x.x.x.x`
 * `3.20-edge`
 * `3.20`, `3.20-x.x.x.x`
 * `3.19-edge`
 * `3.19`, `3.19-x.x.x.x`
-* `3.18-edge`
-* `3.18`, `3.18-x.x.x.x`
-* `3.17-edge`
-* `3.17`, `3.17-x.x.x.x`
 
 > `x.x.x.x` has to be replaced with one of the s6-overlay releases available (e.g. `3.1.0.1`).
 
