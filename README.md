@@ -6,6 +6,13 @@
   <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
 </p>
 
+> [!IMPORTANT]
+> This project is archived and is no longer maintained. s6-overlay is now
+> available directly from Alpine Linux's community repository as the
+> [s6-overlay package](https://pkgs.alpinelinux.org/packages?name=s6-overlay).
+> Use an Alpine base image and install it with `apk add --no-cache s6-overlay`
+> instead of using this project's images.
+
 ## About
 
 Alpine Linux with [s6 overlay](https://github.com/just-containers/s6-overlay/).
